@@ -191,17 +191,23 @@ def cabanisd(Tb,Th,Ta,ax=None,grid=False,**plt_kwargs):
 
     return(ax)
 
-def harker(df,**plt_kwargs):
+def harker(df,fig=None,axs=None,**plt_kwargs):
     #Need to input pandas dataframe with major oxides to plot harker diagrams. Also
     #need all Fe to be in FeOt
-    oxides = ['TiO2','Al2O3','FeOt','P2O5','CaO','MgO','Na2O','K2O']
-    ylims = [(0,2.5),(12,22),(0,15),(0,1.2),(0,15),(0,10),(0,7),(0,4)]
-    fig, axs = plt.subplots(4,2, sharex=True, figsize=(12,16),**plt_kwargs)
+    if fig is None:
+        fig, axs = plt.subplots(4,2, sharex=True, figsize=(6.5,9),dpi=300)
     plt.setp(axs,xlim=(40,75))
+    oxides = ['TiO2','Al2O3','FeOt','P2O5','CaO','MgO','Na2O','K2O']
+    ylims = [(0,2.5),(12,22),(0,15),(0,1.2),(0,15),(0,10),(0,7),(0,4)]   
     for x in range(4): #For loops for oxides
         for y in range(2):
-            df.plot.scatter(x = 'SiO2',y = oxides[2*x+y], ax=axs[x][y],ylim = ylims[2*x+y])
-    return(fig)
+            df.plot.scatter(x = 'SiO2',y = oxides[2*x+y], ax=axs[x][y],ylim = ylims[2*x+y],
+                            **plt_kwargs)
+            #axs[x][y].set_xlabel(fontsize=8)
+            #axs[x][y].set_ylabel(fontsize=8)
+            axs[x][y].tick_params(axis='both', which='major', labelsize=6)
+    plt.tight_layout()
+    return(fig,axs)
 
 def spiders(df,**plt_kwargs):
     #Need to input pandas dataframe
