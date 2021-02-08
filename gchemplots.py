@@ -495,23 +495,40 @@ def immobile(df,ax=None,**plt_kwargs):
     
     return(ax)
     
-    
-
 def NdSr(eNd,Sr,init=False,ax=None,**plt_kwargs):
+    """
+    Plot diagram of epsilon Nd vs. 87Sr/86Sr.
+    
+    Parameters:
+        eNd: Values for epsilon Nd
+        Sr: Values for 87Sr/86Sr
+        init: Boolean for if values are initial values
+        ax: Axes on which to plot diagram
+        
+    Returns:
+        ax: Axes with diagram plotted
+    """
     if ax is None:
         ax = plt.gca()
+    
     ax.scatter(Sr,eNd,**plt_kwargs)
+    
+    # Set labels according to whether initial or present day values
     if init==False:
         ax.set_xlabel('$\mathregular{^{87}Sr/^{86}Sr}$',fontsize=8)
         ax.set_ylabel('\u03B5Nd',fontsize=8)
     elif init==True:
         ax.set_xlabel('$\mathregular{^{87}Sr/^{86}Sr_i}$',fontsize=8)
         ax.set_ylabel('$\mathregular{\u03B5Nd_i}$',fontsize=8)
+    
     ax.set_xlim(0.700,0.712)
     ax.set_ylim(-12,15)
+    
     ax.axvline(0.7045,c='gray',zorder=0)
     ax.axhline(0,c='gray',zorder=0)
+    
     ax.tick_params(axis='both', which='major', labelsize=6)
+    
     return(ax)
 
 def NdSrd(df,init=False,ax=None,**plt_kwargs):
