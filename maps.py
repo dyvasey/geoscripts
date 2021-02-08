@@ -207,27 +207,49 @@ def shpplt(shp,colors,ax=None,crs=ccrs.PlateCarree(),**kwargs):
     return(df)
 
 def scalebar(length,slon,slat,az=90,label=True,ax=None,**kwargs):
-    #function to create scalebar of given length in meters
+    """
+    Plot scalebar of given length in meters.
+    
+    Parameters:
+        length: Length of scalebar in meters
+        slon: Starting longitude (decimal degrees) for scalebar
+        slat: Starting latitude (decimal degrees) for scalebar
+        az = Azimuth of scalebar
+        label: Boolean for whether to label length of scalebar in km
+        ax: Axes on which to plot scalebar
+    
+    Return:
+        ax: Axes with scalebar plotted
+    """
     if ax is None:
         ax = plt.gca()
-    geodesic = cgeo.Geodesic() #set up geodesic calculations
-    #calculate endpoint for given distance
-    end = geodesic.direct(points=[slon,slat],azimuths=az,distances=length).base[0]
+    
+    geodesic = cgeo.Geodesic() # Set up geodesic calculations
+    
+    # Calculate endpoint for given distance
+    end = geodesic.direct(
+        points=[slon,slat],azimuths=az,distances=length).base[0]
     elon = end[0]
     elat = end[1]
     clon = (slon+elon)/2
     clat = (slat+elat)/2
-    #plot line from start to end
-    ax.plot([slon,elon],[slat,elat],transform=ccrs.Geodetic(),**kwargs,linewidth=3)
-    if label==True:
-        #add label with number of km
-        #get map projection from axes
+    
+    # Plot line from start to end
+    ax.plot([slon,elon],[slat,elat],transform=ccrs.Geodetic(),
+            **kwargs,linewidth=3)
+    
+    # Add label with number of km
+    if label==True:    
+        # Get map projection from axes
         crs = ax.projection
-        #transform lat-lon into axes coordinates
+        # Transform lat-lon into axes coordinates
         tlon,tlat = crs.transform_point(clon,clat,src_crs=ccrs.Geodetic())
+        
+        # Add label as annotation
         ax.annotate(text=str(round(length/1000,None))+' km',xy=(tlon,tlat),
                 xytext=(0,3),xycoords='data',textcoords='offset points',
                 fontsize=7,ha='center')
+    
     return(ax)
 
 def narrow(lon,lat,ax=None,lfactor=1,**kwargs):
