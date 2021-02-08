@@ -1,37 +1,45 @@
-# -*- coding: utf-8 -*-
 """
-Created on Tue Dec  8 19:35:45 2020
-
-basemap functions for mapping with cartopy
-
-@author: dyvas
+Module of mapping functions for use with cartopy
 """
+import string
+
 import cartopy.crs as ccrs
 import cartopy.feature as cf
-import matplotlib.pyplot as plt
-import numpy as np
-import string
-import matplotlib
-from shapely import geometry
-import matplotlib.ticker as mticker
-from shapely.geometry.polygon import Polygon
+import cartopy.geodesic as cgeo
 from cartopy.io.shapereader import Reader
 from cartopy.feature import ShapelyFeature
+import matplotlib
+import matplotlib.pyplot as plt
+import matplotlib.ticker as mticker
+import numpy as np
+from shapely import geometry
+from shapely.geometry.polygon import Polygon
 import pandas as pd
-import cartopy.geodesic as cgeo
 
 def bath(res='10m',ax=None):
-    #plot bathymetry from Natural Earth
+    """
+    Plot bathymetry from Natural Earth as set of blue vector polygons.
+    
+    Parameters:
+        res: Resolution of Natural Earth data
+        ax: Axes on which to plot
+    
+    Returns:
+        ax: Axes with bathymetry plotted
+    """
     if ax is None:
         ax = plt.gca()
-    depths = np.append(np.arange(10000,999,-1000),[200,0]) #depth list
-    letters = string.ascii_uppercase #get letters for filenames
-    cmap = matplotlib.cm.get_cmap('Blues') # set colormap
-    colors = cmap(np.linspace(1,0.5,12)) # define colors using 0-1 values from colormap
-    for x in reversed(range(len(depths))): #iterate through depths starting at 0
-        step = 'bathymetry_'+ letters[x] + '_' + str(depths[x]) #get filename
+    
+    depths = np.append(np.arange(10000,999,-1000),[200,0]) # List of depths
+    letters = string.ascii_uppercase # Letters for filenames
+    cmap = matplotlib.cm.get_cmap('Blues') # Set colormap
+    colors = cmap(np.linspace(1,0.5,12)) # Define colors from colormap
+    
+    # Iterate through depths starting at 0 m and plot
+    for x in reversed(range(len(depths))):
+        step = 'bathymetry_'+ letters[x] + '_' + str(depths[x]) # File name
         ax.add_feature(cf.NaturalEarthFeature('physical',step,res),
-                       color=colors[x],zorder=1) #import and add feature at base of map
+                       color=colors[x],zorder=1)
     return(ax)
 
 def boundingbox(box,crs,ax=None,**kwargs):
