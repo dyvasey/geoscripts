@@ -237,25 +237,27 @@ def cabanisd(Tb,Th,Ta,ax=None,grid=False,**plt_kwargs):
     """
     if ax is None:
         ax = plt.gca()
-    #calculate values
+    
+    # Calculate 3Tb and 2Ta
     Tb3 = Tb*3
     Ta2 = Ta*2
     Th1 = Th*1
     
-    #Plot Grid
+    # Plot grid
     if grid==True:
         t, l, r = get_triangular_grid()
         ax.triplot(t, l, r,color='gray',linestyle='--')
     
-    #Make dataframe and plot
+    # Make into Pandas dataframe and plot using pyrolite
     df = pd.concat([Tb3,Th1,Ta2],axis=1)
     df.pyroplot.density(ax=ax,**plt_kwargs)
     
-    #Set plot labels
+    # Set plot labels
     ax.set_tlabel('3Tb',fontsize=8)
     ax.set_llabel('Th',fontsize=8)
     ax.set_rlabel('2Ta',fontsize=8)
     
+    # Remove plot ticks
     ax.taxis.set_ticks([])
     ax.laxis.set_ticks([])
     ax.raxis.set_ticks([])
@@ -263,19 +265,36 @@ def cabanisd(Tb,Th,Ta,ax=None,grid=False,**plt_kwargs):
     return(ax)
 
 def harker(df,fig=None,axs=None,**plt_kwargs):
-    #Need to input pandas dataframe with major oxides to plot harker diagrams. Also
-    #need all Fe to be in FeOt
+    """
+    Plot silica variation ("Harker") diagrams for major oxides.
+    
+    Plots SiO2 (wt. %) against TiO2, Al2O3, FeOt, P2O5, CaO, MgO, Na2O, and
+    K2O
+    
+    Parameters:
+        df: Pandas dataframe with major oxide information. Requires Fe input
+            as FeOt
+        fig: Figure on which to plot diagrams
+        axs: Set of axs within figure on which to plot
+        
+    Returns:
+        fig: Figure with diagrams plotted
+        axs: Axes within figure with diagrams plotted
+    """
+    # Create figure if not specified
     if fig is None:
         fig, axs = plt.subplots(4,2, sharex=True, figsize=(6.5,9),dpi=300)
-    plt.setp(axs,xlim=(40,75))
+   
+   # Set axs limits and oxides 
+    plt.setp(axs,xlim=(40,75)) 
     oxides = ['TiO2','Al2O3','FeOt','P2O5','CaO','MgO','Na2O','K2O']
     ylims = [(0,2.5),(12,22),(0,15),(0,1.2),(0,15),(0,10),(0,7),(0,4)]   
-    for x in range(4): #For loops for oxides
+    
+    # Nested for loops to plot each oxide
+    for x in range(4): 
         for y in range(2):
             df.plot.scatter(x = 'SiO2',y = oxides[2*x+y], ax=axs[x][y],ylim = ylims[2*x+y],
                             **plt_kwargs)
-            #axs[x][y].set_xlabel(fontsize=8)
-            #axs[x][y].set_ylabel(fontsize=8)
             axs[x][y].tick_params(axis='both', which='major', labelsize=6)
     plt.tight_layout()
     return(fig,axs)
