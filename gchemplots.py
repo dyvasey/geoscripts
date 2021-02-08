@@ -182,6 +182,9 @@ def cabanis(Tb,Th,Ta,ax=None,grid=False,first=[],**plt_kwargs):
         ax: Axes on which to plot, requires "ternary" projection from mpltern
         grid: Boolean for whether to add grid to diagram
         first: Empty list by default. If empty and grid is True, plot grid
+    
+    Returns:
+        ax: Axes with diagram plotted
     """
     if ax is None:
         ax = plt.gca()
@@ -213,13 +216,25 @@ def cabanis(Tb,Th,Ta,ax=None,grid=False,first=[],**plt_kwargs):
     ax.taxis.set_ticks([])
     ax.laxis.set_ticks([])
     ax.raxis.set_ticks([])
-
     
     return(ax)
 
 def cabanisd(Tb,Th,Ta,ax=None,grid=False,**plt_kwargs):
-    #Plot Th-3Tb-2Ta diagram of Cabanis and Thieblemont as KDE - requires that axis
-    #have ternary projection from mpltern
+    """
+    Plot Th-3Tb-2Ta diagram of Cabanis and Thieblemont (1988) as KDE.
+    
+    Uses KDE functionality of pyrolite (Williams et al., 2020).
+    
+    Parameters:
+        Tb: List of Tb values
+        Th: List of Th values
+        Ta: List of Ta values
+        ax: Axes on which to plot, requires "ternary" projection from mpltern
+        grid: Boolean for whether to add grid to diagram
+    
+    Returns:
+        ax: Axes with diagram plotted
+    """
     if ax is None:
         ax = plt.gca()
     #calculate values
