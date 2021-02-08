@@ -172,33 +172,44 @@ def TASsm(SiO2,Na2O,K2O,ax=None,first= [],**plt_kwargs):
     return(ax)
 
 def cabanis(Tb,Th,Ta,ax=None,grid=False,first=[],**plt_kwargs):
-    #Plot Th-3Tb-2Ta diagram of Cabanis and Thieblemont - requires that axis
-    #have ternary projection from mpltern
+    """
+    Plot Th-3Tb-2Ta diagram of Cabanis and Thieblemont (1988).
+    
+    Parameters:
+        Tb: List of Tb values
+        Th: List of Th values
+        Ta: List of Ta values
+        ax: Axes on which to plot, requires "ternary" projection from mpltern
+        grid: Boolean for whether to add grid to diagram
+        first: Empty list by default. If empty and grid is True, plot grid
+    """
     if ax is None:
         ax = plt.gca()
-    #calculate values
+    
+    # Calculate 3Tb and 2Ta
     Tb3 = Tb*3
     Ta2 = Ta*2
     
-    #Set plot labels
+    # Set plot labels
     ax.set_tlabel('3Tb',fontsize=8)
     ax.set_llabel('Th',fontsize=8)
     ax.set_rlabel('2Ta',fontsize=8)
     
-     #Plot Grid
+    # Plot grid
     if (grid==True) & (first==[]):
         t, l, r = get_triangular_grid()
         ax.triplot(t, l, r,color='gray',linestyle='--')
         first.append('NotFirst')
     
-    #Plot
+    # Plot data
     ax.scatter(Tb3,Th,Ta2,**plt_kwargs)
     
-    #Set plot labels
+    # Set plot labels
     ax.set_tlabel('3Tb',fontsize=8)
     ax.set_llabel('Th',fontsize=8)
     ax.set_rlabel('2Ta',fontsize=8)
     
+    # Remove plot ticks
     ax.taxis.set_ticks([])
     ax.laxis.set_ticks([])
     ax.raxis.set_ticks([])
