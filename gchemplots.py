@@ -577,13 +577,25 @@ def NdSrd(df,init=False,ax=None,**plt_kwargs):
     ax.axhline(0,c='gray',zorder=0)
     
     ax.tick_params(axis='both', which='major', labelsize=6)
+    
     return(ax)
 
 def subfig(fig,xloc=0,yloc=1,fontsize=16,**plt_kwargs):
-    #Add subfig labels to axes in figure using axes coordinates
-    axes = fig.get_axes() #get all axes in fig
+    """
+    Add subfigure labels to axes in figure using axes coordinates
+    
+    Parameters:
+        fig: Figure on which to apply labels
+        xloc: X location for label, in axes coordinates (0-1)
+        yloc: Y location for label, in axes coordinates (0-1)
+        fontsize: Font size for axes labels
+        
+    Returns:
+        fig: Figure with labels applied
+    """
+    axes = fig.get_axes() # Get all axes in figure
     letters = list(string.ascii_lowercase)
     for x in range(len(axes)):
         axes[x].text(xloc, yloc,'('+letters[x]+')',transform=axes[x].transAxes,
                      fontsize=fontsize,va='top',**plt_kwargs)
-        
+    return(fig)    
