@@ -150,11 +150,24 @@ def smlabels(ax,box,step=1):
     return(gl)
 
 def shpplt_simple(shp,ax=None,crs=ccrs.PlateCarree(),**kwargs):
-    #function to plot ship file from path with uniform colors.
+    """
+    Plot .shp file from path using uniform colors/style
+    
+    Parameters:
+        shp: Path to .shp file
+        ax: Axes on which to plot polygon
+        crs: Cartopy projection for .shp file
+    
+    Retruns:
+        ax: Axes with .shp file plotted
+    """
     if ax is None:
         ax = plt.gca()
+    # Convert .shp file to Shapely Feature
     feature = ShapelyFeature(Reader(shp).geometries(),crs,**kwargs)
+    
     ax.add_feature(feature)
+    
     return(ax)
 
 def shpplt(shp,colors,ax=None,crs=ccrs.PlateCarree(),**kwargs):
