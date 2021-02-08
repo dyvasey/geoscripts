@@ -10,7 +10,7 @@ from mpltern.ternary.datasets import get_triangular_grid
 
 def TAS(SiO2,Na2O,K2O,ax=None,first= [],**plt_kwargs):
     """
-    Plots total alkali-silica (TAS) diagram after Le Bas et al., 198. 
+    Plots total alkali-silica (TAS) diagram after Le Bas et al., 1986. 
     
     Plot divided into alkaline and subalkaline fields after Irvine and
     Barangar, 1971. Values used for plot lines were taken from source code
@@ -35,7 +35,6 @@ def TAS(SiO2,Na2O,K2O,ax=None,first= [],**plt_kwargs):
     # Plot data
     ax.scatter(SiO2,alkalis, **plt_kwargs)
     
-    
     # Check if first empty to avoid repeat plotting of TAS grid/labels
     if first == []:
     # Create lines
@@ -54,17 +53,19 @@ def TAS(SiO2,Na2O,K2O,ax=None,first= [],**plt_kwargs):
         line13 = [[49.4,53,48.4,45],[7.3,9.3,11.5,9.4]]
         line14 = [[53,57.6,52.5,48.4],[9.3,11.7,14,11.5]]
         line15 = [[57.6,69,30],[11.7,17.73,24.15]]
-        lines = [line1,line2,line3,line4,line5,line6,line7,line8,line9,line10,line11,
-                 line12,line13,line14,line15]
+        lines = [line1,line2,line3,line4,line5,line6,line7,line8,line9,line10,
+                 line11,line12,line13,line14,line15]
         
         # Create labels
-        labelsx = [43,48.5,54.8,59.9,67,75,63.5,57.8,52.95,49.2,45,49.2,53,57,43]
+        labelsx = [43,48.5,54.8,59.9,67,75,63.5,57.8,52.95,49.2,45,49.2,53,57,
+                   43]
         labelsy = [1.55,2.8,3,3,3,8,11,8.5,7,5.65,7,9.3,11.5,14,12]
-        labeltext = ['Picrobasalt','Basalt','Basaltic\nAndesite','Andesite','Dacite',
-                     'Rhyolite','Trachyte/Trachydacite','Trachy-andesite',
-                     'Basaltic-\ntrachy-andesite','Trachy-basalt','Tephrite/\nBasanite',
-                     'Phono-tephrite','Tephri-phonolite','Phonolite','Foidite']
-        
+        labeltext = ['Picrobasalt','Basalt','Basaltic\nAndesite','Andesite',
+                     'Dacite','Rhyolite','Trachyte/Trachydacite',
+                     'Trachy-andesite','Basaltic-\ntrachy-andesite',
+                     'Trachy-basalt','Tephrite/\nBasanite','Phono-tephrite',
+                     'Tephri-phonolite','Phonolite','Foidite']
+  
         # Create subalkaline/alkaline fields
         subalkx = [39.2,40,43.2,45,48,50,53.7,55,60,65,77.4]
         subalky = [0,0.4,2,2.8,4,4.75,6,6.4,8,8.8,10]
@@ -73,26 +74,52 @@ def TAS(SiO2,Na2O,K2O,ax=None,first= [],**plt_kwargs):
         # Plot Subalkaline/Alkaline line
         ax.plot(subalkx,subalky,'r--')
         ax.text(38,2,'Alkaline',rotation=45,color='r',ha='center',va='center')
-        ax.text(49,2,'Subalkaline',rotation=45,color='r',ha='center',va='center')
+        ax.text(49,2,'Subalkaline',rotation=45,color='r',ha='center',
+                va='center')
+        
+        #Set axes limits
         ax.set_xlim(35,80)
         ax.set_ylim(0,16)
-        for z in range(15): # Loop through TAS lines
+       
+        for z in range(15): # Loop through and plot TAS lines
             ax.plot(lines[z][0],lines[z][1],'k')
             ax.text(labelsx[z],labelsy[z],labeltext[z],color='k',
                     ha='center',va='center',fontsize=10)
+        
+        # Avoid repeat grid plotting
         first.append('Not First')      
     return(ax)
 
 def TASsm(SiO2,Na2O,K2O,ax=None,first= [],**plt_kwargs):
-    #Function for plotting small TAS diagram, after LeBas86 in GCDkit
+    """
+    Plots small total alkali-silica (TAS) diagram after Le Bas et al., 1986. 
+    
+    This version plots a small TAS diagram with minimal text/labels in order
+    to accomodate the diagram on multi-axes plots. Plot divided into alkaline 
+    and subalkaline fields after Irvine and Barangar, 1971. Values used for 
+    plot lines were taken from source code of GCDKit (Janousek et al., 2006).
+    
+    Parameters:
+        SiO2: List of SiO2 values (wt. %)
+        Na2O: List of Na2O values (wt. %)
+        K2O: List of K2O values (wt. %)
+        ax: Axes on which to plot the diagram
+        first: Empty list by default. If empty, lines/labels will plot
+    
+    Returns:
+        ax: Axes with TAS plotted
+    """
     if ax is None:
         ax = plt.gca()
-    #calculate alkalis
+    # Calculate total alkalis
     alkalis = Na2O + K2O
+    
+    #Plot data
     ax.scatter(SiO2,alkalis, **plt_kwargs)
     
+    # Check if first empty to avoid repeat plotting of TAS grid/labels
     if first == []:
-    #create lines
+    # Create lines
         line1 = [[30,41,41,45,48.4,52.5,30],[0,0,7,9.4,11.5,14,24.15]]
         line2 = [[41,45,45,41],[0,0,3,3]]
         line3 = [[5,52,52,45],[0,0,5,5]]
@@ -108,37 +135,39 @@ def TASsm(SiO2,Na2O,K2O,ax=None,first= [],**plt_kwargs):
         line13 = [[49.4,53,48.4,45],[7.3,9.3,11.5,9.4]]
         line14 = [[53,57.6,52.5,48.4],[9.3,11.7,14,11.5]]
         line15 = [[57.6,69,30],[11.7,17.73,24.15]]
-        lines = [line1,line2,line3,line4,line5,line6,line7,line8,line9,line10,line11,
-                 line12,line13,line14,line15]
-        
-        #create labels
-        labelsx = [43,48.5,54.8,59.9,67,75,63.5,57.8,52.95,49.2,45,49.2,53,57,43]
+        lines = [line1,line2,line3,line4,line5,line6,line7,line8,line9,line10,
+                 line11,line12,line13,line14,line15]
+                      
+        # Create abbreviated labels
+        labelsx = [43,48.5,54.8,59.9,67,75,63.5,57.8,52.95,49.2,45,49.2,53,57,
+                   43]
         labelsy = [1.55,2.8,3,3,3,8,11,8.5,7,5.65,7,9.3,11.5,14,12]
-        labeltext = ['PB','B','BA','A','D',
-                     'R','T/TD','TA',
-                     'BTA','TB','TEP/\nBSN',
-                     'PHT','TPH','PH','FOI']
-        
-        #create subalk/alk fields
-        subalkx = [39.2,40,43.2,45,48,50,53.7,55,60,65,77.4] #Values from GCDkit TAS
+        labeltext = ['PB','B','BA','A','D','R','T/TD','TA','BTA','TB',
+                     'TEP/\nBSN','PHT','TPH','PH','FOI']
+                     
+        # Create subalkaline/alkaline fields
+        subalkx = [39.2,40,43.2,45,48,50,53.7,55,60,65,77.4] 
         subalky = [0,0.4,2,2.8,4,4.75,6,6.4,8,8.8,10]
         
         
-        #Plot Subalkaline/Alkaline line - Irvine71 - adapted from GCDkit
+        #Plot Subalkaline/Alkaline line without text
         ax.plot(subalkx,subalky,'r--')
-        #ax.text(38,2,'Alk',rotation=45,color='r',ha='center',va='center',
-                #fontsize=6)
-        #ax.text(45,2,'Subalk',rotation=45,color='r',ha='center',va='center',
-                #fontsize=6)
+
+        #Set axes limits
         ax.set_xlim(35,80)
         ax.set_ylim(0,16)
+        
         for z in range(15): #loop through TAS lines
             ax.plot(lines[z][0],lines[z][1],'k')
             ax.text(labelsx[z],labelsy[z],labeltext[z],color='k',
                     ha='center',va='center',fontsize=6)
+        
+        # Set small fonts
         ax.set_xlabel('$\mathregular{SiO_2}$ (wt. %)',fontsize=8)
         ax.set_ylabel('$\mathregular{Na{_2}O + K{_2}O}$ (wt. %)',fontsize=8)
         ax.tick_params(axis='both', which='major', labelsize=6)
+        
+        # Avoid repeat grid plotting
         first.append('Not First')      
     return(ax)
 
