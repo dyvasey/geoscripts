@@ -1,33 +1,33 @@
-# -*- coding: utf-8 -*-
 """
-Created on Fri Nov 27 14:41:03 2020
-
-script to import tables from article PDFs into csvs
-
-@author: dyvas
+Module to import tables from PDF journal articles.
 """
 import tabula
 import pandas as pd
 from pdf2image import convert_from_path
-
-try:
-    from PIL import Image
-except ImportError:
-    import Image
+from PIL import Image
 import pytesseract
 
-# If you don't have tesseract executable in your PATH, include the following:
-pytesseract.pytesseract.tesseract_cmd = 'C:/Program Files/Tesseract-OCR/tesseract.exe'
-
-#Necessary to make tesseract OCR run, requires IDE to be in admin mode
-
 def article(pdf,page,filename,**kwargs):
-    #function to extract table from PDF article with tabula
+    """
+    Extract table from PDF article with tabula.
+    
+    Requires that text be embedded in PDF. Also requires path to article
+    PDFs be defined within function
+    
+    Parameters:
+        pdf: Name of PDF file in folder defined within function
+        page: Page of PDF with table
+        filename: Name of .csv table to output
+    
+    Returns:
+        df: Pandas dataframe with table
+    """
+    # Must set to path with PDFs on local machine
     path = "C:/Users/dyvas/Box Sync/JournalArticles/" + pdf + ".pdf"
 
     dfs = tabula.read_pdf(path, pages=page,**kwargs)
     
-    df = dfs[0] #convert to single dataframe
+    df = dfs[0] # Convert to single dataframe
     
     outdir = './' + filename + '.csv'
     
@@ -39,6 +39,12 @@ def articleocr(pdf,page):
     #function to extract table from PDF article with no prior OCR
     #Converts page to image, then writes OCR with tesseract, then 
     #extracts table with tabula. Likely requires additional cleanup
+    
+    # Add Tesseract executable to path, needed for OCR
+    # Requires IDE in admin mode
+    tpath = 'C:/Program Files/Tesseract-OCR/tesseract.exe'
+    pytesseract.pytesseract.tesseract_cmd = tpath
+    
     path = "C:/Users/dyvas/Box Sync/JournalArticles/" + pdf + ".pdf"
     image = convert_from_path(path,first_page=page,last_page=page)
     #image[0].save(pdf + '.jpg','JPEG')
