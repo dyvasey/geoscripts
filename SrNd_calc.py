@@ -21,7 +21,7 @@ def epsNd(Ndrat,Smrat=0,age=0):
     years = 10**6 # Converter for Ma to years
     time = age*years # Years for initial calc
     
-    Ndi = Ndrat-(Smrat*(exp(lambdaSm*time)-1)) # Calculate initial 143/144
+    Ndi = Ndrat-(Smrat*(exp(lambdaSm*time)-1)) # Calculate initial 143Nd/144Nd
     
     CHUR143 = 0.512630 #CHUR 143Nd/144Nd from Bouvier et al., 2008
     CHUR147 = 0.1960 # CHUR 147Sm/44Nd from Bouvier et al., 2008
@@ -34,10 +34,21 @@ def epsNd(Ndrat,Smrat=0,age=0):
         return (Ndi,eNdi)
 
 def Srinit(Srrat,Rbrat,age):
-    lambdaRb = 1.39e-11 #Rb-87 decay constant
-    years = 10**6 #Converter for Ma to years
-    time = age*years #years for initial calc
+    """
+    Calculate initial 87Sr/86Sr.
     
-    Sri = Srrat-(Rbrat*(exp(lambdaRb*time)-1)) #calculate initial 143/144
+    Paramters:
+        Srrat: Measured 87Sr/86Sr ratio
+        Rbrat: Measured 87Rb/86Sr ratio
+        age: Age of sample in Ma
+    
+    Returns:
+        Sri: initial 87Sr/86Sr ratio
+    """
+    lambdaRb = 1.39e-11 # Rb-87 decay constant
+    years = 10**6 # Converter for Ma to years
+    time = age*years # Years for initial calc
+    
+    Sri = Srrat-(Rbrat*(exp(lambdaRb*time)-1)) # Calculate initial 87Sr/86Sr
     return (Sri)
     
