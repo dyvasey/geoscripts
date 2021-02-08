@@ -1,5 +1,5 @@
 """
-Module of mapping functions for use with cartopy
+Module of mapping functions for use with Cartopy
 """
 import string
 
@@ -43,7 +43,17 @@ def bath(res='10m',ax=None):
     return(ax)
 
 def boundingbox(box,crs,ax=None,**kwargs):
-    #bounding box for simple boxes where north is up
+    """
+    Plot bounding box for simple boxes where north is up.
+    
+    Parameters:
+        box: list of min/max values for box - xmin, xmax, ymin, ymax
+        crs: Cartopy projection for box values
+        ax: Axes on which to plot values
+    
+    Returns:
+        ax: Axes with bounding box plotted
+    """
     if ax is None:
         ax = plt.gca()
     geo = geometry.box(box[0],box[2],box[1],box[3])
@@ -51,6 +61,7 @@ def boundingbox(box,crs,ax=None,**kwargs):
     return(ax)
 
 def bb_irreg(lon,lat,ax=None,**kwargs):
+    
     #bounding box where vertices can be defined as lat lon
     if ax is None:
         ax = plt.gca()
