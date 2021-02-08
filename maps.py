@@ -253,29 +253,50 @@ def scalebar(length,slon,slat,az=90,label=True,ax=None,**kwargs):
     return(ax)
 
 def narrow(lon,lat,ax=None,lfactor=1,**kwargs):
-    #north arrow plotter
+    """
+    Plot north arrow.
+    
+    Parameters:
+        lon: Starting longitude (decimal degrees) for arrow
+        lat: Starting latitude (ecimal degrees) for arrow
+        ax: Axes on which to plot arrow
+        lfactor: Length factor to increase/decrease arrow length
+    
+    Returns:
+        ax: Axes with arrow plotted
+    """
     if ax is None:
         ax = plt.gca()
-    geodesic = cgeo.Geodesic() #set up geodesic calculations
-    #get map projection from axes
+    
+    geodesic = cgeo.Geodesic() # Set up geodesic calculations
+    
+    # Get map projection from axes
     crs = ax.projection
+    
+    # Get geodetic projection for lat/lon - do not confuse with geodesic
     gdet = ccrs.Geodetic()
+    
+    # Get axes extent and convert to lat/lon
     x1,x2,y1,y2 = ax.get_extent()
-    #left,right = ax.get_xlim() #get x limit of graph
-    tlx,tly = gdet.transform_point(x1,y2,src_crs=crs) #convert top left to latlon
-    blx,bly = gdet.transform_point(x1,y1,src_crs=crs) #convert bottom left to latlon
-    diff = abs(bly-tly) #get x coverage of graph in degrees
-    #get endpoint scaled by diff and lfactor
-    end = geodesic.direct(points=[lon,lat],azimuths=0,distances=lfactor*diff*2*10**4).base[0]
+    tlx,tly = gdet.transform_point(x1,y2,src_crs=crs) 
+    blx,bly = gdet.transform_point(x1,y1,src_crs=crs) 
+    diff = abs(bly-tly) # Get x coverage of plot in decimal degrees
+    
+    # Get arrow endpoint scaled by diff and lfactor
+    end = geodesic.direct(
+        points=[lon,lat],azimuths=0,distances=lfactor*diff*2*10**4).base[0]
 
-    #transform lat-lon into axes coordinates
+    # Transform lat-lon into axes coordinates
     xstart,ystart = crs.transform_point(lon,lat,src_crs=ccrs.Geodetic())
-    #x-y coordinates of endpoint
+    
+    # Get X-Y coordinates of endpoint
     xend,yend = crs.transform_point(end[0],end[1],src_crs=ccrs.Geodetic())
-    #plot arrow
+    
+    # Plot arrow as annotation
     ax.annotate("",xy=(xstart,ystart),xycoords='data',xytext=(xend,yend),
                 textcoords='data',arrowprops=dict(arrowstyle="<|-",
                                                   connectionstyle="arc3"))
-    #add N
+    # Add N to arrow
     ax.text(xend,yend,'N',fontsize=7,ha='center')
+    
     return(ax)
