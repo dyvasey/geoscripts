@@ -171,16 +171,39 @@ def shpplt_simple(shp,ax=None,crs=ccrs.PlateCarree(),**kwargs):
     return(ax)
 
 def shpplt(shp,colors,ax=None,crs=ccrs.PlateCarree(),**kwargs):
-    #Give shapefile path (shp), list of colors for each type.
-    reader = Reader(shp) #creates reader object
-    units = reader.records() #gets records from reader object
-    lst = [] #set up empty list
-    for unit in units: #iterate over each object in shp file
-        t = unit.attributes['type'] #get type number from attributes to assign color
-        geo = unit.geometry # get geometry to plot
-        ax.add_geometries([geo],crs,facecolor=colors[t-1],**kwargs) #plot geometry using type attribute to assign color
-        lst.append(unit.attributes) #add attributes to list to create dataframe
+    """
+    Plot .shp file from path using variable colors.
+    
+    Requires that .shp file have field 'type' with numerical values that
+    will correspond to color.
+    
+    Parameters:
+        shp: Path to .shp file
+        colors: List of colors corresponding to each 'type' in .shp file
+        ax: Axes on which to plot polygon
+        crs: Cartopy projection for .shp file
+    
+    Retruns:
+        df: Pandas dataframe of attribute table from .shp file
+    """
+    reader = Reader(shp) # Creates reader object
+    units = reader.records() # Gets records from reader object
+    lst = [] # Set up empty list
+    
+    for unit in units: # Iterate over each object in .shp file
+        # Get type number from attributes to assign color, requires 'type'
+        # field in imported .shp file
+        t = unit.attributes['type'] 
+        geo = unit.geometry # Get geometry to plot
+        
+        # Plot geometry using type attribute to assign color
+        ax.add_geometries([geo],crs,facecolor=colors[t-1],**kwargs) 
+        
+        # Add attributes to list to create dataframe
+        lst.append(unit.attributes) 
+    
     df = pd.DataFrame.from_records(lst)  #create dataframe of attribute table
+    
     return(df)
 
 def scalebar(length,slon,slat,az=90,label=True,ax=None,**kwargs):
