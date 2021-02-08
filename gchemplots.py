@@ -313,8 +313,7 @@ def spiders(df,**plt_kwargs):
     
     Retruns:
         fig: Figure with both plots
-    """
-    
+    """ 
     # Convert P and Ti from oxides to ppm, if needed, using pyrolite
     PTioxides = df[['P2O5','TiO2']] #isolate oxides only
     pti = PTioxides.pyrochem.convert_chemistry(to=["P", "Ti"]) #Convert
@@ -377,11 +376,29 @@ def spiders(df,**plt_kwargs):
     return(fig)
 
 def REE(df,ax=None,**plt_kwargs):
+    """
+    Plot rare earth element digaram, normalized to primitive mantle.
+    
+    Plot normalized to primitive mantle values of Sun and McDonough, 1989.
+    Does not contain seldom-used Pm or Tm. Uses pyrolite extensively.
+    
+    Parameters:
+        df: Pandas dataframe with geochemical data.
+        ax: Axes on which to plot diagram
+    
+    Returns:
+        ax: Axes with diagram plotted
+    """
     if ax is None:
         ax = plt.gca()
+   
+    # Convert P and Ti from oxides to ppm, if needed, using pyrolite
     PTioxides = df[['P2O5','TiO2']] #isolate oxides only
-    pti = PTioxides.pyrochem.convert_chemistry(to=["P", "Ti"]) #Convert P2O and TiO2
+    pti = PTioxides.pyrochem.convert_chemistry(to=["P", "Ti"]) #Convert
     pti_ppm = pti.pyrochem.scale('wt%','ppm')
+    
+    # Set of if statements for how to proceed depending on if P/Ti were
+    # previously reported
     if pd.Series(['P', 'Ti']).isin(df.columns).all():    
         df.update(pti_ppm)   
         print(1)
@@ -397,18 +414,19 @@ def REE(df,ax=None,**plt_kwargs):
         df = pd.concat([df,pti_ppm],axis=1)
         print(4)
     
-    sm89 = ["La", "Ce", "Pr", "Nd", "Sm", "Eu",
+    # Set rare earth elements
+    ree = ["La", "Ce", "Pr", "Nd", "Sm", "Eu",
         "Gd", "Tb", "Dy", "Ho", "Er", "Yb", "Lu"]
     
-    trace = df[sm89]
-    
+    # Get values from dataframe and normalized
+    trace = df[ree] 
     norm = trace.pyrochem.normalize_to(reference="PM_SM89", units="ppm")
     
     norm.pyroplot.spider(
     ax=ax,
     **plt_kwargs,
     unity_line=True, 
-    components=sm89,   
+    components=ree,   
     )
     
     ax.set_ylim(0.1,1000)
