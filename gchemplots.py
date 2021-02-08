@@ -532,30 +532,50 @@ def NdSr(eNd,Sr,init=False,ax=None,**plt_kwargs):
     return(ax)
 
 def NdSrd(df,init=False,ax=None,**plt_kwargs):
-    #Needs df with epsNd and Sr labels already present
+    """
+    Plot diagram of epsilon Nd vs. 87Sr/86Sr as KDE using pyrolite.
+    
+    Parameters:
+        df: Pandas dataframe with epsilon Nd and 87Sr/86Sr. Requires columns
+            labeled '87Sr/86Sr' and '\u03B5Nd'.
+        init: Boolean for if values are initial values
+        ax: Axes on which to plot diagram
+        
+    Returns:
+        ax: Axes with diagram plotted
+    """
     if ax is None:
         ax = plt.gca()
 
+    # Plot using appropriate labels, depending on whether values are initial.
     if init==False:
-        df.loc[:,['87Sr/86Sr','\u03B5Nd']].pyroplot.density(ax=ax,
-                                                            extent=[0.700,0.712,-12,15],
-                                                        vmin=0.05,bins=100,
-                                                        **plt_kwargs)
+        df.loc[:,['87Sr/86Sr','\u03B5Nd']].pyroplot.density(
+        ax=ax,
+        extent=[0.700,0.712,-12,15],                                                
+        vmin=0.05,
+        bins=100,                                            
+        **plt_kwargs
+        )
         ax.set_xlabel('$\mathregular{^{87}Sr/^{86}Sr}$',fontsize=8)
         ax.set_ylabel('\u03B5Nd',fontsize=8)
        
     elif init==True:
-        df.loc[:,['87Sr/86Sri','\u03B5Ndi']].pyroplot.density(ax=ax,
-                                                            extent=[0.700,0.712,-12,15],
-                                                        vmin=0.05,bins=100,
-                                                        **plt_kwargs)
+        df.loc[:,['87Sr/86Sri','\u03B5Ndi']].pyroplot.density(
+        ax=ax,
+        extent=[0.700,0.712,-12,15],                                                
+        vmin=0.05,
+        bins=100,                                            
+        **plt_kwargs
+        )    
         ax.set_xlabel('$\mathregular{^{87}Sr/^{86}Sr_i}$',fontsize=8)
         ax.set_ylabel('$\mathregular{\u03B5Nd_i}$',fontsize=8)
         
     ax.set_xlim(0.700,0.712)
     ax.set_ylim(-12,15)
+    
     ax.axvline(0.7045,c='gray',zorder=0)
     ax.axhline(0,c='gray',zorder=0)
+    
     ax.tick_params(axis='both', which='major', labelsize=6)
     return(ax)
 
