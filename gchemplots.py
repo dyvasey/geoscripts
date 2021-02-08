@@ -1,20 +1,27 @@
-# -*- coding: utf-8 -*-
 """
-Created on Wed Nov 18 18:03:43 2020
-
-@author: dyvas
+Module for making geochemical plots.
 """
-
+import string
 
 import matplotlib.pyplot as plt
 import pandas as pd
 import pyrolite.plot
-import numpy as np
 from mpltern.ternary.datasets import get_triangular_grid
-import string
 
 def TAS(SiO2,Na2O,K2O,ax=None,first= [],**plt_kwargs):
-    #Function for plotting TAS diagram, after LeBas86 in GCDkit
+    """
+    Plots total alkali-silica (TAS) diagram after Le Bas et al., 1986
+    
+    Parameters:
+        SiO2: List of SiO2 values (wt. %)
+        Na2O: List of Na2O values (wt. %)
+        K2O: List of K2O values (wt. %)
+        ax: Axes on which to plot the diagram
+        first: Empty list by default. If empty, lines/labels will plot
+    
+    Returns:
+        ax: Axes with TAS plotted
+    """
     if ax is None:
         ax = plt.gca()
     #calculate alkalis
