@@ -61,10 +61,21 @@ def boundingbox(box,crs,ax=None,**kwargs):
     return(ax)
 
 def bb_irreg(lon,lat,ax=None,**kwargs):
+    """
+    Plot irregular bounding box with vertices defined as longitude/latitude.
     
-    #bounding box where vertices can be defined as lat lon
+    Parameters:
+        lon: Longitude values in decimal degrees
+        lat: latitude values in decimal degrees
+        ax: Axes on which to plot values
+    
+    Returns:
+        ax: Axes with bounding box plotted
+    """
     if ax is None:
         ax = plt.gca()
+    
+    # Create Shapely polygon of values
     pgon = Polygon(((lon[0], lat[0]),
         (lon[1], lat[1]),
         (lon[2], lat[2]),
