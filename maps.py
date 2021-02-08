@@ -49,7 +49,7 @@ def boundingbox(box,crs,ax=None,**kwargs):
     Parameters:
         box: list of min/max values for box - xmin, xmax, ymin, ymax
         crs: Cartopy projection for box values
-        ax: Axes on which to plot values
+        ax: Axes on which to plot bounding box
     
     Returns:
         ax: Axes with bounding box plotted
@@ -67,7 +67,7 @@ def bb_irreg(lon,lat,ax=None,**kwargs):
     Parameters:
         lon: Longitude values in decimal degrees
         lat: latitude values in decimal degrees
-        ax: Axes on which to plot values
+        ax: Axes on which to plot bounding box
     
     Returns:
         ax: Axes with bounding box plotted
@@ -85,23 +85,38 @@ def bb_irreg(lon,lat,ax=None,**kwargs):
     return(ax)
 
 def bb_auto(source_ax,ax=None,**kwargs):
+    """
+    Plot bounding box using boundaries of existing axes.
+    
+    Parameters:
+        source_ax: Axes object from which boundaries will be drawn
+        ax: Axes on which to plot bounding box
+    """
     if ax is None:
         ax = plt.gca()
+    
+    # Convert source axes corners to values in the display coordinate system
     bleft = source_ax.transAxes.transform((0,0))
     bright = source_ax.transAxes.transform((1,0))
     tleft = source_ax.transAxes.transform((0,1))
     tright = source_ax.transAxes.transform((1,1))
     
+    # Convert display coordinate system values to data (map) coordinate system
     bl_ll = source_ax.transData.inverted().transform(bleft)
     br_ll = source_ax.transData.inverted().transform(bright)
     tl_ll = source_ax.transData.inverted().transform(tleft)
     tr_ll = source_ax.transData.inverted().transform(tright)
+    
+    # Make coordinates into Shapely polygon
     pgon = Polygon((bl_ll,
         br_ll,
         tr_ll,
         tl_ll,
         bl_ll))
+    
+    # Add bounding box to Axes, indicating that data are in source axes coords
     ax.add_geometries([pgon], crs=source_ax.projection,**kwargs)
+    
     return(ax)
     
 
