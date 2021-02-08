@@ -300,10 +300,28 @@ def harker(df,fig=None,axs=None,**plt_kwargs):
     return(fig,axs)
 
 def spiders(df,**plt_kwargs):
-    #Need to input pandas dataframe
+    """
+    Plots figure of rare earth element plot and immobile element plot.
+    
+    Plots rare earth element plot and imbbolie element plot after Pearce,
+    2014. Rare earth element plot does not include Pm or Tm, given low
+    availability in used data. Somewhat deprecated in favor of REE and
+    immobile below, which are more flexible for multi-axes figures.
+    
+    Parameters:
+        df: Pandas dataframe with necessary trace element data
+    
+    Retruns:
+        fig: Figure with both plots
+    """
+    
+    # Convert P and Ti from oxides to ppm, if needed, using pyrolite
     PTioxides = df[['P2O5','TiO2']] #isolate oxides only
-    pti = PTioxides.pyrochem.convert_chemistry(to=["P", "Ti"]) #Convert P2O and TiO2
+    pti = PTioxides.pyrochem.convert_chemistry(to=["P", "Ti"]) #Convert
     pti_ppm = pti.pyrochem.scale('wt%','ppm')
+    
+    # Set of if statements for how to proceed depending on if P/Ti were
+    # previously reported
     if pd.Series(['P', 'Ti']).isin(df.columns).all():    
         df.update(pti_ppm)   
         print(1)
@@ -318,18 +336,23 @@ def spiders(df,**plt_kwargs):
     else:
         df = pd.concat([df,pti_ppm],axis=1)
         print(4)
-    trace = df[["La", "Ce", "Pr", "Nd", "Sm", "Eu",
-                  "Gd", "Tb", "Dy", "Ho", "Er", "Yb","Lu","Th","Nb",
-                  "Ta","P","Zr","Hf","Ti","Y"]] #NOTE: Removed Pm and Tm
-
+    
+    # List of elements for both plots
+    trace = df[["La", "Ce", "Pr", "Nd", "Sm", "Eu","Gd", "Tb", "Dy", "Ho",
+                   "Er", "Yb","Lu","Th","Nb","Ta","P","Zr","Hf","Ti","Y"]]
+                  
+    # Normalize to primitive mantle
     norm = trace.pyrochem.normalize_to(reference="PM_SM89", units="ppm")
     
-    sm89 = ["La", "Ce", "Pr", "Nd", "Sm", "Eu",
+    # Define rare earth elements
+    ree = ["La", "Ce", "Pr", "Nd", "Sm", "Eu",
         "Gd", "Tb", "Dy", "Ho", "Er", "Yb", "Lu"]
 
-    sm95 = ["Th", "Nb", "Ta", "La", "Ce", "P", "Nd",
+    # Define immobile elements
+    imm = ["Th", "Nb", "Ta", "La", "Ce", "P", "Nd",
         "Zr", "Hf", "Sm", "Eu", "Ti", "Gd", "Tb", "Y", "Yb"]
     
+    # Set up figure and plot
     fig, ax = plt.subplots(1, 2, figsize=(20, 5))
     plt.setp(ax, ylim=(0.1,1000))
     
@@ -337,16 +360,17 @@ def spiders(df,**plt_kwargs):
         ax=ax[0],
         **plt_kwargs,
         unity_line=True, 
-        components=sm89,   
+        components=ree,   
     )
     
     norm.pyroplot.spider(
         ax=ax[1],
         **plt_kwargs,
         unity_line=True,
-        components=sm95,  
+        components=imm,  
     )
     
+    # Add titles
     ax[0].set_title('REE Elements')
     ax[1].set_title('Incompatible Elements')
     
