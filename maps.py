@@ -119,18 +119,34 @@ def bb_auto(source_ax,ax=None,**kwargs):
     
     return(ax)
     
-
 def smlabels(ax,box,step=1):
-    #function to add small labels for lat/lon
+    """
+    Add small latitude/longitude labels to map.
+    
+    Parameters:
+        ax: Axes on which to add labels
+        box: Values across which to make labels - xmin, xmax, ymin, ymax
+        step: How wide steps should be between labels, in data coordinates.
+    
+    Returns:
+        gl: Gridlines ojbect to add to axes
+    """
     gl = ax.gridlines(draw_labels=True)
     gl.bottom_labels = False
     gl.right_labels = False
     gl.xlabel_style = {'size': 6}
     gl.ylabel_style = {'size': 6}
-    gl.xlocator = mticker.FixedLocator(np.arange(round(box[0]-step/2,None),
-                                             round(box[1]+step/2,None),step))
-    gl.ylocator = mticker.FixedLocator(np.arange(round(box[2]-step/2,None),
-                                                 round(box[3]+step/2,None),step))
+    
+    # Add x labels
+    gl.xlocator = mticker.FixedLocator(
+        np.arange(round(box[0]-step/2,None),round(box[1]+step/2,None),step)                                     
+        )
+    
+    # Add y labels
+    gl.ylocator = mticker.FixedLocator(
+        np.arange(round(box[2]-step/2,None),round(box[3]+step/2,None),step)
+        )
+    
     return(gl)
 
 def shpplt_simple(shp,ax=None,crs=ccrs.PlateCarree(),**kwargs):
