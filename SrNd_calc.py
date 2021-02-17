@@ -73,15 +73,17 @@ def RbSr_rat(Rb,Sr,Srrat):
     Rb85_abund = 0.7217
     Rb87_abund = 0.2783
     
+
     Sr84_mass = 83.913419
     Sr86_mass = 85.90926073
     Sr87_mass = 86.90887750
     Sr88_mass = 87.90561226
     
-    # Abundances vary - only used for calculation of ratios that don't vary
+    # Sr abundances vary - only used for calculation of ratios that 
+    # don't vary
     Sr84_abund = 0.0056
     Sr86_abund = 0.0986
-    Sr87_abund = 0.0700
+    Sr87_abund = 0.0700 # Not used
     Sr88_abund = 0.8258
     
     Sr_8886 = Sr88_abund/Sr86_abund # 88Sr/86Sr ratio - doesn't vary
@@ -110,7 +112,9 @@ def RbSr_rat(Rb,Sr,Srrat):
     
     return(rbsr8786)
     
-def SmNd_rat(Sm,Nd):
+def SmNd_rat(Sm,Nd,Ndrat):
+    
+    # Sm and Nd isotopic parameters - from CIAAW
     Sm144_mass = 143.91201
     Sm147_mass = 146.91490
     Sm148_mass = 147.91483
@@ -126,9 +130,59 @@ def SmNd_rat(Sm,Nd):
     Sm150_abund = 0.0737
     Sm152_abund = 0.2674
     Sm154_abund = 0.2274
+    
+    Nd142_mass = 141.90773
+    Nd143_mass = 142.90982
+    Nd144_mass = 143.91009
+    Nd145_mass = 144.91258
+    Nd146_mass = 145.91312
+    Nd148_mass = 147.91690
+    Nd150_mass = 149.920902
+    
 
+    # Nd abundances vary 
+    
+    # Non-varying Nd ratios (from Faure et al., 2005)
+    Nd_146144 = 0.7219 # Hamilton et al., 1983
+    Nd_142144 = 1.141827
+    Nd_145144 = 0.348417
+    Nd_148144 = 0.241578
+    Nd_150144 = 0.236418
+    
+    # Calculate Nd abundances
+    Nd144_abund = Ndrat/(Ndrat + 1 + Nd_146144 + Nd_142144 + Nd_145144
+                         + Nd_148144 + Nd_150144)
+    Nd142_abund = Nd_142144*Nd144_abund
+    Nd143_abund = Ndrat*Nd144_abund
+    Nd145_abund = Nd_145144*Nd144_abund
+    Nd146_abund = Nd_146144*Nd144_abund   
+    Nd148_abund = Nd_148144*Nd144_abund
+    Nd150_abund = Nd_150144*Nd144_abund
+    
+    # Total mass for Sm and Nd
     Sm_mass = (
         Sm144_mass*Sm144_abund + Sm147_mass*Sm147_abund + Sm148_mass*
         Sm148_abund + Sm149_mass*Sm149_abund + Sm150_mass*Sm150_abund +
         Sm152_mass*Sm152_abund + Sm154_mass*Sm154_abund
         )
+    
+    Nd_mass = (
+        Nd142_mass*Nd142_abund + Nd143_mass*Nd143_abund + 
+        Nd144_mass*Nd144_abund + Nd145_mass*Nd145_abund +
+        Nd146_mass*Nd146_abund + Nd148_mass*Nd148_abund +
+        Nd150_mass*Nd150_abund
+        )
+    
+    # 147Sm and 143Nd
+    Sm147 = Sm*Sm147_abund/Sm_mass
+    Nd144 = Nd*Nd144_abund/Nd_mass
+    
+    smnd147144 = Sm147/Nd144
+    
+    check1 = (Sm/Nd) * (0.53149+0.14252*Ndrat)
+    check2 = (Sm/Nd) * 0.602
+    
+    print('Check1: ',check1)
+    print('Check2: ',check2)
+    
+    return(smnd147144)
