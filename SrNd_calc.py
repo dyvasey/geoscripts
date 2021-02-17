@@ -51,4 +51,21 @@ def Srinit(Srrat,Rbrat,age):
     
     Sri = Srrat-(Rbrat*(exp(lambdaRb*time)-1)) # Calculate initial 87Sr/86Sr
     return (Sri)
+
+def RbSr(Rb,Sr):
+    """
+    Calculate 87Rb/86Sr from Rb and Sr concentrations
+    
+    Paramters:
+        Rb: Rb concentration (ppm)
+        Sr: Sr concentration (ppm)
+    
+    Returns:
+        rbsr8786: Calculated 87Rb/86Sr ratio
+        
+    """
+    rbsr = Rb/Sr
+    rbsr8786 = rbsr * 2.894
+    
+    return(rbsr8786)
     
