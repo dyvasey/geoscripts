@@ -1,7 +1,8 @@
 """
 Module for calculations with Rb-Sr and Sm-Nd isotopic systems
 """
-from numpy import exp,log
+from numpy import exp
+import pandas as pd
 
 def epsNd(Ndrat,Smrat=0,age=0):
     """
@@ -28,10 +29,16 @@ def epsNd(Ndrat,Smrat=0,age=0):
     CHUR143i = CHUR143-CHUR147*(exp(lambdaSm*time)-1) # Calculate CHUR for age
     eNd = ((Ndrat/CHUR143)-1)*10**4 # Calculate EpsNd
     eNdi = ((Ndi/CHUR143i)-1)*10**4 # Calculate EpsNdi
-    if age==0:   
+    # If age a single integer, create iterable list.
+    if isinstance(age,int):
+        age = pd.Series(age)
+        
+    if 0 not in age.values: 
+        return (Ndi,eNdi)
+    elif 0 in age.values:          
         return (eNd)
     else:
-        return (Ndi,eNdi)
+        print('Mix of zero and non-zero ages')
 
 def Srinit(Srrat,Rbrat,age):
     """
