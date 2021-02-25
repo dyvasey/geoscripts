@@ -119,7 +119,18 @@ def RbSr_rat(Rb,Sr,Srrat):
     
     return(rbsr8786)
     
-def SmNd_rat(Sm,Nd,Ndrat):
+def SmNd_rat(Sm,Nd,Ndrat):    
+    """
+    Calculate 147Sm/144Nd using reported Sm, Nd, and 143Nd/144Nd
+    
+    Parameters:
+        Sm: Sm concentration (ppm)
+        Nd: Nd concentration (ppm)
+        Ndrat: 143Nd/144Nd ratio
+    
+    Returns:
+        smnd147/144: Calculated 147Sm/144Nd ratio
+    """
     
     # Sm and Nd isotopic parameters - from CIAAW
     Sm144_mass = 143.91201
