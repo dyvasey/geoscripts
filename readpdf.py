@@ -78,7 +78,7 @@ def articleocr(pdf,page):
     
     return(df)
 
-def imgocr(img):
+def imgocr(img,**kwargs):
     """
     Extract table from JPG image using OCR and tabula.
     
@@ -108,7 +108,7 @@ def imgocr(img):
         f.write(file) # PDF type is bytes by default
         
     #Extract table with tabula
-    dfs = tabula.read_pdf('./'+ newpath,pages=1)
+    dfs = tabula.read_pdf('./'+ newpath,pages=1,**kwargs)
     df = dfs[0] # Convert to single dataframe
     
     # Save .csv with extracted table
