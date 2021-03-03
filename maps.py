@@ -170,18 +170,19 @@ def shpplt_simple(shp,ax=None,crs=ccrs.PlateCarree(),**kwargs):
     
     return(ax)
 
-def shpplt(shp,colors,ax=None,crs=ccrs.PlateCarree(),**kwargs):
+def shpplt(shp,colors,ax=None,crs=ccrs.PlateCarree(),field='type',**kwargs):
     """
     Plot .shp file from path using variable colors.
     
-    Requires that .shp file have field 'type' with numerical values that
+    Requires that .shp file have field with numerical values that
     will correspond to color.
     
     Parameters:
         shp: Path to .shp file
-        colors: List of colors corresponding to each 'type' in .shp file
+        colors: List of colors corresponding to field in .shp file
         ax: Axes on which to plot polygon
         crs: Cartopy projection for .shp file
+        field: Name of field with values used for color
     
     Retruns:
         df: Pandas dataframe of attribute table from .shp file
@@ -193,7 +194,7 @@ def shpplt(shp,colors,ax=None,crs=ccrs.PlateCarree(),**kwargs):
     for unit in units: # Iterate over each object in .shp file
         # Get type number from attributes to assign color, requires 'type'
         # field in imported .shp file
-        t = unit.attributes['type'] 
+        t = unit.attributes[field] 
         geo = unit.geometry # Get geometry to plot
         
         # Plot geometry using type attribute to assign color
