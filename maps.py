@@ -170,16 +170,17 @@ def shpplt_simple(shp,ax=None,crs=ccrs.PlateCarree(),**kwargs):
     
     return(ax)
 
-def shpplt(shp,colors,ax=None,crs=ccrs.PlateCarree(),field='type',**kwargs):
+def shpplt(shp,colors,ax=None,crs=ccrs.PlateCarree(),field='type',
+           numbered=True,**kwargs):
     """
-    Plot .shp file from path using variable colors.
+    Plot polygon .shp file from path using variable colors.
     
     Requires that .shp file have field with numerical values that
     will correspond to color.
     
     Parameters:
         shp: Path to .shp file
-        colors: List of colors corresponding to field in .shp file
+        colors: List or dict of colors corresponding to field in .shp file
         ax: Axes on which to plot polygon
         crs: Cartopy projection for .shp file
         field: Name of field with values used for color
@@ -197,8 +198,14 @@ def shpplt(shp,colors,ax=None,crs=ccrs.PlateCarree(),field='type',**kwargs):
         t = unit.attributes[field] 
         geo = unit.geometry # Get geometry to plot
         
-        # Plot geometry using type attribute to assign color
-        ax.add_geometries([geo],crs,facecolor=colors[t-1],**kwargs) 
+        # Plot geometry using field attribute to assign color
+        
+        # If field sequential integers, adapt for Python counting
+        if numbered is True:
+            ax.add_geometries([geo],crs,facecolor=colors[t-1],**kwargs)
+        # If field non-sequential, use color dictionary
+        elif numbered is False:
+            ax.add_geometries([geo],crs,facecolor=colors[t],**kwargs)
         
         # Add attributes to list to create dataframe
         lst.append(unit.attributes) 
@@ -301,3 +308,9 @@ def narrow(lon,lat,ax=None,lfactor=1,**kwargs):
     ax.text(xend,yend,'N',fontsize=7,ha='center')
     
     return(ax)
+
+def lyr_color(lyr):
+    """
+    Import .lyr file and get dictionary of colors
+    """
+    
