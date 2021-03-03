@@ -2,6 +2,7 @@
 Module of mapping functions for use with Cartopy
 """
 import string
+import json
 
 import cartopy.crs as ccrs
 import cartopy.feature as cf
@@ -309,8 +310,32 @@ def narrow(lon,lat,ax=None,lfactor=1,**kwargs):
     
     return(ax)
 
-def lyr_color(lyr):
+def lyr_color(js):
     """
-    Import .lyr file and get dictionary of colors
+    Import JSON of .lyr file and extract dictionary of value/color.
+    
+    Requires using arcpy in ArcMap consoleto first extract .lyr file as JSON. 
+    See arc_scripts.py.
     """
+    # Open the JSON file
+    with open(js,"r") as file:
+        text = json.load(file)
+
+    # Convert str to dictionary
+    main = json.loads(text)
+    renderer = main['renderer']
+    unique = renderer['uniqueValueInfos']
+    
+    d = {} # Create empty dictionary
+    
+    # Extract value and color
+    for unit in unique:
+        value = unit['value']
+        value_int = int(value)
+        color = unit['symbol']['color']
+        color_norm = [x/255 for x in color ]
+        color_tuple = tuple(color_norm)
+        d[value_int]=color_tuple
+    
+    return(d)
     
