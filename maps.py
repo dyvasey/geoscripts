@@ -314,7 +314,7 @@ def lyr_color(js):
     """
     Import JSON of .lyr file and extract dictionary of value/color.
     
-    Requires using arcpy in ArcMap consoleto first extract .lyr file as JSON. 
+    Requires using arcpy in ArcMap console to first extract .lyr file as JSON. 
     See arc_scripts.py.
     """
     # Open the JSON file
