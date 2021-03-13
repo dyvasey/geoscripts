@@ -120,7 +120,7 @@ def bb_auto(source_ax,ax=None,**kwargs):
     
     return(ax)
     
-def smlabels(ax,box,step=1):
+def smlabels(ax,box,step=1,rnd=None):
     """
     Add small latitude/longitude labels to map.
     
@@ -140,12 +140,12 @@ def smlabels(ax,box,step=1):
     
     # Add x labels
     gl.xlocator = mticker.FixedLocator(
-        np.arange(round(box[0]-step/2,None),round(box[1]+step/2,None),step)                                     
+        np.arange(round(box[0]-step/2,rnd),round(box[1]+step/2,rnd),step)                                     
         )
     
     # Add y labels
     gl.ylocator = mticker.FixedLocator(
-        np.arange(round(box[2]-step/2,None),round(box[3]+step/2,None),step)
+        np.arange(round(box[2]-step/2,rnd),round(box[3]+step/2,rnd),step)
         )
     
     return(gl)
@@ -338,4 +338,19 @@ def lyr_color(js):
         d[value_int]=color_tuple
     
     return(d)
+
+def qgis_color(csv='colors.csv'):
+    """
+    Import .csv of colors for QGIS layer into dictionary
     
+    Requires extracting csv from QGIS using qgis_scripts.py
+    """
+    # Import CSV
+    data = pd.read_csv(csv,index_col=0)
+    color_list = data['0'].str.split(',')
+    d = {}
+    for index,value in color_list.items():
+        color_tuple = tuple([float(x)/255 for x in value])
+        d[index]=color_tuple
+    
+    return(d)
