@@ -215,7 +215,7 @@ def shpplt(shp,colors,ax=None,crs=ccrs.PlateCarree(),field='type',
     
     return(df)
 
-def scalebar(length,slon,slat,az=90,label=True,ax=None,**kwargs):
+def scalebar(length,slon='auto',slat='auto',az=90,label=True,ax=None,**kwargs):
     """
     Plot scalebar of given length in meters.
     
@@ -234,14 +234,23 @@ def scalebar(length,slon,slat,az=90,label=True,ax=None,**kwargs):
         ax = plt.gca()
     
     geodesic = cgeo.Geodesic() # Set up geodesic calculations
+    # Get map projection from axes
+    crs = ax.projection
+    
+    if (slon=='auto')&(slat=='auto'):
+        trans = ax.transAxes + ax.transData.inverted()
+        sx,sy = trans.transform((0.1,0.1))
+        slon,slat = ccrs.Geodetic().transform_point(sx,sy,src_crs=crs)
     
     # Calculate endpoint for given distance
     end = geodesic.direct(
         points=[slon,slat],azimuths=az,distances=length).base[0]
     elon = end[0]
     elat = end[1]
-    clon = (slon+elon)/2
-    clat = (slat+elat)/2
+    mid = geodesic.direct(
+        points=[slon,slat],azimuths=az,distances=length/2).base[0]
+    clon = mid[0]
+    clat = mid[1]
     
     # Plot line from start to end
     ax.plot([slon,elon],[slat,elat],transform=ccrs.Geodetic(),
@@ -249,8 +258,7 @@ def scalebar(length,slon,slat,az=90,label=True,ax=None,**kwargs):
     
     # Add label with number of km
     if label==True:    
-        # Get map projection from axes
-        crs = ax.projection
+
         # Transform lat-lon into axes coordinates
         tlon,tlat = crs.transform_point(clon,clat,src_crs=ccrs.Geodetic())
         
