@@ -140,12 +140,12 @@ def smlabels(ax,box,step=1,rnd=None):
     
     # Add x labels
     gl.xlocator = mticker.FixedLocator(
-        np.arange(round(box[0]-step/2,rnd),round(box[1]+step/2,rnd),step)                                     
+        np.arange(round(box[0]-step/2,rnd),round(box[1]+step,rnd),step)                                     
         )
     
     # Add y labels
     gl.ylocator = mticker.FixedLocator(
-        np.arange(round(box[2]-step/2,rnd),round(box[3]+step/2,rnd),step)
+        np.arange(round(box[2]-step/2,rnd),round(box[3]+step,rnd),step)
         )
     
     return(gl)
