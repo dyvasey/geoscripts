@@ -269,7 +269,7 @@ def scalebar(length,slon='auto',slat='auto',az=90,label=True,ax=None,**kwargs):
     
     return(ax)
 
-def narrow(lon,lat,ax=None,lfactor=1,**kwargs):
+def narrow(lon='auto',lat='auto',ax=None,lfactor=1,**kwargs):
     """
     Plot north arrow.
     
@@ -289,6 +289,11 @@ def narrow(lon,lat,ax=None,lfactor=1,**kwargs):
     
     # Get map projection from axes
     crs = ax.projection
+    
+    if (lon=='auto')&(lat=='auto'):
+        trans = ax.transAxes + ax.transData.inverted()
+        sx,sy = trans.transform((0.2,0.2))
+        lon,lat = ccrs.Geodetic().transform_point(sx,sy,src_crs=crs)
     
     # Get geodetic projection for lat/lon - do not confuse with geodesic
     gdet = ccrs.Geodetic()
