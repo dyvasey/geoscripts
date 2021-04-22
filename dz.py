@@ -1,6 +1,8 @@
 """
 Module for processing and plotting detrital zircon data
 """
+import pickle
+
 import seaborn as sns
 import numpy as np
 import cartopy.crs as ccrs
@@ -111,6 +113,14 @@ class DZSample:
         self.bestage.to_csv(filename)
         
         return
+    
+    def save(self,filename=None):
+        if filename==None:
+            filename = self.name + '.dz'
+        
+        pickle.dump(self, open(filename,"wb"))
+        
+        return
 
 def composite(samples,name,color=None):
     """
@@ -128,6 +138,12 @@ def composite(samples,name,color=None):
         comp.reported_age.append(sample.reported_age)
     
     return(comp)
+
+def load(filename):
+    
+    dz = pickle.load(open(filename,"rb"))
+    
+    return(dz)
 
         
             
