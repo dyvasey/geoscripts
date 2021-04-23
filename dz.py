@@ -8,6 +8,7 @@ import numpy as np
 import cartopy.crs as ccrs
 import matplotlib.pyplot as plt
 import pandas as pd
+import geopandas as gpd
 
 class DZSample:
     """ Object to hold detrital zircon sample metadata and ages """
@@ -63,7 +64,8 @@ class DZSample:
         
         return(self.bestage)
     
-    def kde(self,ax=None,log_scale=True,add_n=True,xaxis=True,**kwargs):
+    def kde(self,ax=None,log_scale=True,add_n=True,xaxis=True,
+            save_img=False,**kwargs):
         """
         Plot KDE using best age.
         """
@@ -86,6 +88,31 @@ class DZSample:
             ax.get_xaxis().set_visible(False)
         
         return(ax)
+    
+    def kde_img(self,log_scale=True,add_n=True,**kwargs):
+        """
+        Save KDE as image file tied to dz object
+        """
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        
+        sns.kdeplot(self.bestage,log_scale=log_scale,label=self.name,
+                    ax=ax,shade=True,color=self.color,**kwargs)
+        
+        ax.spines['top'].set_visible(False)
+        ax.spines['right'].set_visible(False)
+        ax.spines['left'].set_visible(False)
+        ax.get_yaxis().set_visible(False)
+        
+        if add_n == True:
+            text = 'n = ' + str(self.bestage.count())
+            ax.text(0.02,0.5,text,transform=ax.transAxes,fontweight='bold')
+        
+        name = self.name+'_KDE.png'
+        self.kde_path = name
+        fig.savefig(name)
+        
+        return
     
     def map_location(self,ax=None,crs=ccrs.PlateCarree(),**kwargs):
         """
@@ -145,6 +172,33 @@ def load(filename):
     
     return(dz)
 
+def write_file(samples,filename):
+    """
+    Create point shapefile or GeoPackage from multiple samples
+    """
+    latitude = []
+    longitude = []
+    name = []
+    reported_age = []
+    bestage = []
+    kde_path = []
+    
+    for sample in samples:
+        latitude.append(sample.latlon[0])
+        longitude.append(sample.latlon[1])
+        name.append(sample.name)
+        reported_age.append(sample.reported_age)
+        bestage.append(sample.bestage)
+        kde_path.append(sample.kde_path)        
+    
+    geometry = gpd.points_from_xy(longitude,latitude)
+    data = {'name':name,'reported_age':reported_age,
+            'kde_path':kde_path}
+    gdf = gpd.GeoDataFrame(data,geometry=geometry)
+    
+    gdf.to_file(filename)
+    return(gdf)
+    
         
             
             
