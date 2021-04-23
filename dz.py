@@ -16,12 +16,13 @@ class DZSample:
     
     # Define basic attributes
     def __init__(self,name,latlon=None,agedata=None,color=None,
-                 reported_age=None):
+                 reported_age=None,source=None):
         self.name = name
         self.latlon= latlon
         self.agedata = agedata
         self.color = color
         self.reported_age = reported_age
+        self.source = source
         
         return
 
@@ -115,7 +116,7 @@ class DZSample:
         path = 'dz/'
         os.makedirs(path,exist_ok=True)
         name = self.name+'_KDE.png'
-        self.kde_path = name
+        self.kde_path = path+name
         fig.savefig(path+name)
         
         return
@@ -193,21 +194,36 @@ def write_file(samples,filename):
     name = []
     reported_age = []
     kde_path = []
+    source = []
     
     for sample in samples:
         latitude.append(sample.latlon[0])
         longitude.append(sample.latlon[1])
         name.append(sample.name)
         reported_age.append(sample.reported_age)
-        kde_path.append(sample.kde_path)        
+        kde_path.append(sample.kde_path)    
+        source.append(sample.source)
     
     geometry = gpd.points_from_xy(longitude,latitude)
     data = {'name':name,'reported_age':reported_age,
-            'kde_path':kde_path}
+            'kde_path':kde_path,'source':source}
     gdf = gpd.GeoDataFrame(data,geometry=geometry)
     
-    gdf.to_file(filename)
+    gdf.to_file(filename,crs='EPSG:4326')
     return(gdf)
+
+def load_all(path='dz/'):
+    """
+    Load all dz files in directory
+    """
+    samples = []
+    for file in os.listdir(path):
+        if file.endswith('.dz'):
+            obj = load(file)
+            samples.append(obj)
+    
+    return(samples)
+            
     
         
             
