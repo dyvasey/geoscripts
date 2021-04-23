@@ -2,6 +2,7 @@
 Module for processing and plotting detrital zircon data
 """
 import pickle
+import os
 
 import seaborn as sns
 import numpy as np
@@ -89,15 +90,18 @@ class DZSample:
         
         return(ax)
     
-    def kde_img(self,log_scale=True,add_n=True,**kwargs):
+    def kde_img(self,log_scale=True,add_n=True,bw_adjust=0.5,xlim=(10,4000),
+                **kwargs):
         """
         Save KDE as image file tied to dz object
         """
         fig = plt.figure()
         ax = fig.add_subplot(111)
+        ax.set_xlim(xlim)
         
         sns.kdeplot(self.bestage,log_scale=log_scale,label=self.name,
-                    ax=ax,shade=True,color=self.color,**kwargs)
+                    ax=ax,shade=True,color=self.color,bw_adjust=bw_adjust,
+                    **kwargs)
         
         ax.spines['top'].set_visible(False)
         ax.spines['right'].set_visible(False)
@@ -108,9 +112,11 @@ class DZSample:
             text = 'n = ' + str(self.bestage.count())
             ax.text(0.02,0.5,text,transform=ax.transAxes,fontweight='bold')
         
+        path = 'dz/'
+        os.makedirs(path,exist_ok=True)
         name = self.name+'_KDE.png'
         self.kde_path = name
-        fig.savefig(name)
+        fig.savefig(path+name)
         
         return
     
@@ -134,18 +140,24 @@ class DZSample:
         return(ax)
     
     def export_ages(self,filename=None):
+        path = 'dz/'
+        os.makedirs(path,exist_ok=True)
+        
         if filename==None:
             filename = self.name + '.csv'
         
-        self.bestage.to_csv(filename)
+        self.bestage.to_csv(path+filename)
         
         return
     
     def save(self,filename=None):
+        path = 'dz/'
+        os.makedirs(path,exist_ok=True)
+        
         if filename==None:
             filename = self.name + '.dz'
         
-        pickle.dump(self, open(filename,"wb"))
+        pickle.dump(self, open(path+filename,"wb"))
         
         return
 
@@ -167,8 +179,8 @@ def composite(samples,name,color=None):
     return(comp)
 
 def load(filename):
-    
-    dz = pickle.load(open(filename,"rb"))
+    path = 'dz/'
+    dz = pickle.load(open(path+filename,"rb"))
     
     return(dz)
 
@@ -180,7 +192,6 @@ def write_file(samples,filename):
     longitude = []
     name = []
     reported_age = []
-    bestage = []
     kde_path = []
     
     for sample in samples:
@@ -188,7 +199,6 @@ def write_file(samples,filename):
         longitude.append(sample.latlon[1])
         name.append(sample.name)
         reported_age.append(sample.reported_age)
-        bestage.append(sample.bestage)
         kde_path.append(sample.kde_path)        
     
     geometry = gpd.points_from_xy(longitude,latitude)
