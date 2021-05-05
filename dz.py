@@ -91,7 +91,7 @@ class DZSample:
         
         return(ax)
     
-    def kde_img(self,log_scale=True,add_n=True,bw_adjust=0.5,xlim=(10,4000),
+    def kde_img(self,log_scale=True,add_n=True,bw_adjust=0.2,xlim=(10,4000),
                 **kwargs):
         """
         Save KDE as image file tied to dz object
