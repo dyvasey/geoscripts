@@ -120,7 +120,7 @@ def bb_auto(source_ax,ax=None,**kwargs):
     
     return(ax)
     
-def smlabels(ax,box,step=1,rnd=None):
+def smlabels(ax,box,step=1,rnd=None,bottom=False,right=False):
     """
     Add small latitude/longitude labels to map.
     
@@ -128,12 +128,15 @@ def smlabels(ax,box,step=1,rnd=None):
         ax: Axes on which to add labels
         box: Values across which to make labels - xmin, xmax, ymin, ymax
         step: How wide steps should be between labels, in data coordinates.
+        rnd: How many decimal places to round steps to.
+        bottom: Whether to add labels to bottom of map.
+        right: Whether to add labels to right of map.
     
     Returns:
         gl: Gridlines ojbect to add to axes
     """
     gl = ax.gridlines(draw_labels=True)
-    gl.bottom_labels = False
+    gl.bottom_labels = bottom
     gl.right_labels = False
     gl.xlabel_style = {'size': 6}
     gl.ylabel_style = {'size': 6}
