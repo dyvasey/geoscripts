@@ -28,6 +28,8 @@ def classifyTAS(df):
     bta = Polygon([(52,5),(57,5.9),(53,9.3),(49.4,7.3)])
     tb = Polygon([(45,5),(52,5),(49.4,7.3)])
     tepbsn = Polygon([(41,3),(45,3),(45,5),(49.4,7.3),(45,9.4),(41,7)])
+    ptep = Polygon([(45,9.4),(48.4,11.5),(53,9.3),(49.4,7.3)])
+    ta = Polygon([(57,5.9),(49.4,7.3),(57.6,11.7),(63,7)])
     
     # Calculate total alkalis
     df['alkalis'] = df.K2O + df.Na2O
@@ -47,6 +49,10 @@ def classifyTAS(df):
             elif tb.contains(point):
                 df.loc[i,'Lithology']='Trachybasalt'
             elif tepbsn.contains(point):
-                df.loc[i,'Lithology']='Tephrite' # Missing basanite
+                df.loc[i,'Lithology']='Tephrite/Basanite'
+            elif ptep.contains(point):
+                df.loc[i,'Lithology']='Phono-tephrite' 
+            elif ta.contains(point):
+                df.loc[i,'Lithology']='Trachyandesite' 
     
     return(df)
