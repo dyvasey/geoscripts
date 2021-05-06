@@ -12,11 +12,25 @@ import pandas as pd
 import geopandas as gpd
 
 class DZSample:
-    """ Object to hold detrital zircon sample metadata and ages """
+    """ Object to hold detrital zircon sample metadata and ages. """
     
     # Define basic attributes
     def __init__(self,name,latlon=None,agedata=None,color=None,
                  reported_age=None,source=None):
+        """
+        Constructs necessary attributes for DZ object.
+        
+        Parameters:
+            name: Sample name
+            latlon (tuple): Sample coordinates in latitude/longitude
+            agedata: Raw age data for the sample
+            color: Sample color for plotting
+            reported_age: Depositional age for the sample
+            source: Publication source for the sample
+            
+        Returns:
+            None
+        """
         self.name = name
         self.latlon= latlon
         self.agedata = agedata
@@ -30,6 +44,19 @@ class DZSample:
                          age_cutoff=400):
         """
         Calculate discordance of 238U/206Pb and 207Pb/206Pb ages.
+        
+        Defaults follow values typically used at Arizona LaserChron Center.
+        
+        Parameters:
+            col_238: Series or array with 238U/206Pb ages
+            col_207: Series or array with 207Pb/206Pb ages.
+            cutoff: % discordance filter cutoff
+            reverse_cutoff: % reverse discordance filter cutoff (negative)
+            age_cutoff: Age (Ma) above which to run the discordance filter
+        
+        Returns:
+            discordance: % discordance for each analysis
+            discard: Boolean of whether age should be discarded for discordance
         """
         discordance = (
             1-(self.agedata[col_238]/self.agedata[col_207]))*100
@@ -46,7 +73,23 @@ class DZSample:
     def calc_bestage(self,col_238,col_207,age_cutoff=900,filter_disc=True,
                      disc_cutoff=20,reverse_cutoff=-5,disc_age_cutoff=400):
         """
-        Determine best age from 238U/206Pb and 207Pb/206Pb ages
+        Determine best age from 238U/206Pb and 207Pb/206Pb ages.
+        
+        Uses discordance filter from calc_discordance and default values from
+        Arizona LaserChron Center.
+        
+        Parameters:
+            col_238: Series or array with 238U/206Pb ages
+            col_207: Series or array with 207Pb/206Pb ages.
+            age_cutoff: Age above which to use 207Pb/206Pb age as best age
+            filter_disc: Boolean for whether to use discordance filter
+            disc_cutoff: % discordance cutoff for discordance filter
+            reverse_cutoff: % reverse discordance cutoff for discordance filter
+                            (negative)
+            disc_age_cutoff: Age cutoff for discordance filter
+            
+        Returns:
+            bestage: Best ages (Ma)
         """
         # Use 238 age where 238 age is less than given age
         self.bestage = self.agedata[col_238].where(
@@ -67,9 +110,18 @@ class DZSample:
         return(self.bestage)
     
     def kde(self,ax=None,log_scale=True,add_n=True,xaxis=True,
-            save_img=False,**kwargs):
+            **kwargs):
         """
-        Plot KDE using best age.
+        Plot KDE via Seaborn using best age.
+        
+        Parameters:
+            ax: Axes on which to plot KDE
+            log_scale: Whether to plot age on logarithmic scale
+            add_n: Whether to add number of analyses to plot
+            xaxis: Whether to show x axis labels
+        
+        Returns:
+            ax: Axes which KDE plotted
         """
         if ax == None:
             ax = plt.gca()
@@ -94,7 +146,16 @@ class DZSample:
     def kde_img(self,log_scale=True,add_n=True,bw_adjust=0.2,xlim=(10,4000),
                 **kwargs):
         """
-        Save KDE as image file tied to dz object
+        Save KDE as image file tied to dz object.
+        
+        Parameters:
+            log_scale: Whether to plot age on logarithmic scale
+            add_n: Whether to add number of analyses to plot
+            bw_adjust: Bandwidth adjustment via Seaborn
+            xlim: Range of x axis
+        
+        Returns:
+            None
         """
         fig = plt.figure()
         ax = fig.add_subplot(111)
@@ -123,7 +184,14 @@ class DZSample:
     
     def map_location(self,ax=None,crs=ccrs.PlateCarree(),**kwargs):
         """
-        Add sample location to map
+        Add sample location to map with Cartopy.
+        
+        Parameters:
+            ax: Axes on which to plot location
+            crs: Cartopy coordinate reference system
+        
+        Returns:
+            ax: Axes with location plotted
         """
         if ax == None:
             ax = plt.gca()
@@ -141,6 +209,15 @@ class DZSample:
         return(ax)
     
     def export_ages(self,filename=None):
+        """
+        Export best ages to CSV file for external processing.
+        
+        Parameters:
+            filename: name of CSV file (optional)
+        
+        Returns:
+            None
+        """
         path = 'dz/'
         os.makedirs(path,exist_ok=True)
         
@@ -152,6 +229,12 @@ class DZSample:
         return
     
     def save(self,filename=None):
+        """
+        Save DZ object to .dz file to reload in other scripts.
+        
+        Parameters:
+            filename: name of file (optional)
+        """
         path = 'dz/'
         os.makedirs(path,exist_ok=True)
         
@@ -164,7 +247,16 @@ class DZSample:
 
 def composite(samples,name,color=None):
     """
-    Create composite DZ data from multiple samples
+    Create composite DZ data from multiple samples.
+    
+    Parameters:
+        samples: List of DZ objects
+        name: Name of composite data
+        color: Color to use for plotting
+        
+    Returns:
+        comp: DZ object with composite data
+    
     """
     comp = DZSample(name,color=color)
     comp.bestage = pd.Series()
@@ -180,6 +272,15 @@ def composite(samples,name,color=None):
     return(comp)
 
 def load(filename):
+    """
+    Load .dz file into DZ object.
+    
+    Parameters:
+        filename: Name of .dz in file in dz/ path.
+        
+    Returns:
+        dz: DZ object with loaded data.
+    """
     path = 'dz/'
     dz = pickle.load(open(path+filename,"rb"))
     
@@ -187,7 +288,14 @@ def load(filename):
 
 def write_file(samples,filename):
     """
-    Create point shapefile or GeoPackage from multiple samples
+    Create point shapefile from multiple samples.
+    
+    Parameters:
+        samples: List of DZ objects
+        filename: Name of shapefile
+    
+    Returns:
+        gdf: GeoPandas GeoDataFrame written to the shapefile
     """
     latitude = []
     longitude = []
@@ -214,7 +322,13 @@ def write_file(samples,filename):
 
 def load_all(path='dz/'):
     """
-    Load all dz files in directory
+    Load all dz files in directory using the load function
+    
+    Parameters:
+        path: Path to directory with .dz files
+    
+    Returns:
+        samples: List of loaded DZ objects
     """
     samples = []
     for file in os.listdir(path):
