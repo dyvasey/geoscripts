@@ -9,6 +9,13 @@ import os
 def get_colors(filename='colors.csv'):
     """
     Get colors for active layer in QGIS
+    
+    Parameters:
+        filename: Name of file to ouput colors to
+        
+    Returns:
+        names: Values in the field of interest.
+        colors: Colors corresponding to the values.
     """
     # Get active layer
     layer = iface.activeLayer()
