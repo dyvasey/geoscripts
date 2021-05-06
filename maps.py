@@ -332,6 +332,12 @@ def lyr_color(js):
     
     Requires using arcpy in ArcMap console to first extract .lyr file as JSON. 
     See arc_scripts.py.
+    
+    Parameters:
+        js: Path to json file
+        
+    Returns:
+        d: dictionary of values and corresponding RGB colors (0-1)
     """
     # Open the JSON file
     with open(js,"r") as file:
@@ -360,6 +366,13 @@ def qgis_color(csv='colors.csv'):
     Import .csv of colors for QGIS layer into dictionary
     
     Requires extracting csv from QGIS using qgis_scripts.py
+    
+    Parameters:
+        csv: Path to csv file.
+    
+    Returns:
+        d: dictionary of values and corresponding RGB colors (0-1)
+    
     """
     # Import CSV
     data = pd.read_csv(csv,index_col=0)
