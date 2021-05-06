@@ -11,7 +11,8 @@ def classifyTAS(df):
     Classify samples missing lithology using TAS diagram.
     
     Uses values for TAS diagram of Le Bas et al., 1986 as compiled in source
-    code of GCDkit (Janousek et al., 2006). 
+    code of GCDkit (Janousek et al., 2006). Only a subset of TAS fields are
+    currently implemented.
     
     Parameters:
         df: Pandas dataframe with SiO2, K2O, and Na2O values and 'Lithology'
