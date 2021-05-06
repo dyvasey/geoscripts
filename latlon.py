@@ -26,6 +26,17 @@ def dms2deg(latdeg,londeg,latmin,lonmin,latsec=0,lonsec=0):
 def UTM2latlon(easting,northing,zone,south=False):
     """
     Calculate latitude/longitude from UTM.
+    
+    Parameters:
+        easting: UTM easting (m)
+        northing: UTM northing (m)
+        zone: UTM zone as integer
+        south: Whether UTM zone is from the southern hemisphere
+    
+    Returns:
+        lat: Latitude (decimal degrees)
+        lon: Longitude (decimal degrees)
+    
     """
     # Set ouptput to lat/lon
     crs = ccrs.Geodetic()
