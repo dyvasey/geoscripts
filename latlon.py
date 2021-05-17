@@ -19,8 +19,13 @@ def dms2deg(latdeg,londeg,latmin,lonmin,latsec=0,lonsec=0):
         lat: Latitude in decimal degrees
         lon: Longitude in decimal degrees
     """
-    lat = (latdeg + (latmin+latsec/60)/60)
-    lon = (londeg + (lonmin+lonsec/60)/60)
+    lat = (abs(latdeg) + (abs(latmin)+abs(latsec)/60)/60)
+    lon = (abs(londeg) + (abs(lonmin)+abs(lonsec)/60)/60)
+    
+    if latdeg<0:
+        lat = -lat
+    if londeg<0:
+        lon = -lon
     return(lat,lon)
 
 def UTM2latlon(easting,northing,zone,south=False):
