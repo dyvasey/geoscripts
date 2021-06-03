@@ -1,6 +1,6 @@
 # Geoscripts
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)[![DOI](https://zenodo.org/badge/334745753.svg)](https://zenodo.org/badge/latestdoi/334745753)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![DOI](https://zenodo.org/badge/334745753.svg)](https://zenodo.org/badge/latestdoi/334745753)
 
 ## About
 
@@ -8,9 +8,7 @@ A series of Python modules designed to support geologic data analysis and figure
 
 ## Reference
 
-Vasey, D.A., Cowgill, E., & Cooper, K.M. (in revision). A Preliminary Framework for Magmatism in Modern Continental Back-Arc Basins and Its Application to the Triassic-Jurassic Tectonic Evolution of the Caucasus. _Geochemistry, Geophysics, Geosystems._
-
-
+Vasey, D.A., Cowgill, E., and Cooper, K.M., 2021, A Preliminary Framework for Magmatism in Modern Continental Back-Arc Basins and Its Application to the Triassic-Jurassic Tectonic Evolution of the Caucasus: _Geochemistry, Geophysics, Geosystems_, v. 22, p. e2020GC009490, doi:https://doi.org/10.1029/2020GC009490.
 
 
 
