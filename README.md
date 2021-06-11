@@ -4,7 +4,7 @@
 
 ## About
 
-A series of Python modules designed to support geologic data analysis and figure construction. Currently, this repository primarily contains functions used in the analysis and preparation of Vasey et al. (in revision), as well as additional projects. Assuming the user has the required dependencies, each module can be placed within the PYTHONPATH and imported, but the modules are not currently compiled into an installable package. These modules are heavily dependent on a range of non-standard packages, including cartopy, mpltern, pyrolite, tabula, and pytesseract.
+A series of Python modules designed to support geologic data analysis and figure construction. Currently, this repository primarily contains functions used in the analysis and preparation of Vasey et al. (2021), as well as additional projects. Assuming the user has the required dependencies, each module can be placed within the PYTHONPATH and imported, but the modules are not currently compiled into an installable package. These modules are heavily dependent on a range of non-standard packages, including cartopy, mpltern, pyrolite, tabula, and pytesseract.
 
 ## Reference
 
