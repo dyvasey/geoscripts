@@ -3,6 +3,7 @@ Functions for doing geophysical calculations
 """
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
 
 def viscosity(A,n,d,m,E,P,V,T,strain_rate=1e-15,R=8.31451):
     """
@@ -13,17 +14,18 @@ def viscosity(A,n,d,m,E,P,V,T,strain_rate=1e-15,R=8.31451):
     Parameters:
         A: Power-law constant
         n: Stress exponent
-        d: Grain size
+        d: Grain size (m)
         m: Grain size exponent
-        E: Activation energy
-        P: Pressure
-        V: Activation volume
-        T: Temperature
-        strain_rate: Second invariant of strain rate tensor
-        R: Gas constant
+        E: Activation energy (J/mol)
+        P: Pressure (Pa)
+        V: Activation volume (m^3/mol)
+        T: Temperature (K)
+        strain_rate: square root of the second invariant of 
+            the strain rate tensor (s^-1)
+        R: Gas constant (J/K*mol)
         
     Returns:
-        visc: Viscosity
+        visc: Viscosity (Pa*s)
     """
     visc = (
         0.5 * A**(-1/n) * d**(m/n) * (strain_rate)**((1-n)/n) * 
@@ -45,6 +47,23 @@ def visc_dislocation(A,n,E,P,V,T,strain_rate=1e-15,R=8.31451):
 
 def visc_disl_alt(C,n,t,E,I2=1e-15,R=8.31451):
     
+    """
+    Alternative method of calculating viscosity for dislocation creep from
+    John Naliboff script.
+    
+    Parameters:
+        C: Power-law constant (prefactor)
+        n: Stress exponent
+        t: Temperature (K)
+        E: Activation energy (J/mol)
+        I2: Square root of the second invariant of the 
+            strain rate tensor (s^-1)
+        R: Gas constant (J/K*mol)
+    
+    Returns:
+        v: Viscosity (Pa*s)
+
+    """
     ev = (C**(-1./n)) * (I2**(1./(n))) * np.exp(E/(n*R*(t)))
     
     v = ev/2/I2
@@ -65,6 +84,10 @@ def visc_diffusion(A,d,m,E,P,V,T,strain_rate=1e-15,R=8.31451):
 def visc_composite(visc_dislocation,visc_diffusion):
     """
     Calculate composite diffusion and dislocation creep viscosity.
+    
+    Parameters:
+        visc_dislocation: Viscosity (Pa*s) for dislocation creep
+        visc_diffusion: Viscosity (Pa*s) for diffusion creep
     """
     
     visc = (visc_dislocation*visc_diffusion)/(visc_dislocation+visc_diffusion)
@@ -79,6 +102,20 @@ def cond_geotherm(thicknesses=[20,20,60],depth=400,
     after Chapman86 and Naliboff scripts. Designed to be combined with
     adiabatic geotherm (i.e., asthenosphere temperature set as LAB
     temperature).
+    
+    Parameters:
+        thicknesses: Thicknesses of lithospheric units (km)
+        depth: Depth of model (km)
+        radiogenic_heat: Radiogenic heat production in each unit (W/m^3)
+        surface_t: Surface temperature (K)
+        heat_flow: Surface heat flow (W/m^3)
+        thermal_conductivity: Thermal conductivity (W/m*K)
+    
+    Returns:
+        temps: Conductive temperatures (K) at each layer boundary
+        heat_flows: Heat flows (W/m^3) at each layer boundary
+        z: Array of depths (m)
+        tc: Conductive temperatures at each depth (K)
     """
     thick_m = [x*1000 for x in thicknesses]
     
@@ -135,6 +172,17 @@ def adiab_geotherm(z,ast=1573,gravity=9.81,thermal_expansivity=2.e-5,
     """
     Calculate adiabatic geotherm. Assumes numpy array of depths (z) has
     already been calculated using conc_geotherm()
+    
+    Parameters:
+        z: Array of depths (m)
+        ast: Adiabatic surface temperature (K)
+        gravity: Gravitational acceleration (m/s^-2)
+        thermal_expansivity: Thermal expansivity (K^-1)
+        heat_capacity: Heat capacity (J/K*kg)
+        depth: Depth of model (km)
+    
+    Returns:
+        ta: Adiabatic temperature for each depth (K)
     """
     ta = np.zeros(depth+1) # empty array for ta
     for i in range(np.size(z)):
@@ -150,10 +198,34 @@ def adiab_geotherm(z,ast=1573,gravity=9.81,thermal_expansivity=2.e-5,
 def geotherm(thicknesses=[20,20,60],depth=400,
              radiogenic_heat=[1.e-6,2.5e-7,0.],surface_t=273,
              heat_flow=0.05296,thermal_conductivity=2.5,ast=1573,gravity=9.81,
-             thermal_expansivity=2.e-5,heat_capacity=750,plot=True):
+             thermal_expansivity=2.e-5,heat_capacity=750,plot=True,
+             save=True):
     """
     Calculate combined conductive and adiabatic geotherm, after Naliboff
     scripts.
+    
+    Parameters:
+        thicknesses: Thicknesses of lithospheric units (km)
+        depth: Depth of model (km)
+        radiogenic_heat: Radiogenic heat production in each unit (W/m^3)
+        surface_t: Surface temperature (K)
+        heat_flow: Surface heat flow (W/m^3)
+        thermal_conductivity: Thermal conductivity (W/m*K)
+        ast: Adiabatic surface temperature (K)
+        gravity: Gravitational acceleration (m/s^-2)
+        thermal_expansivity: Thermal expansivity (K^-1)
+        heat_capacity: Heat capacity (J/K*kg)
+        plot: Whether to plot the geotherm
+        save: Whether to save boundary temperatures and heat flows to
+            separate csv file.
+        
+    Returns:
+        temps: Conductive temperatures (K) at each layer boundary
+        heat_flows: Heat flows (W/m^3) at each layer boundary
+        z: Array of depths (m)
+        tt: Temperature (K) of combined conductive and adiabatic geotherm at
+            each depth.
+        
     """
     # Conductive geotherm
     temps,heat_flows,z,tc = cond_geotherm(thicknesses=thicknesses,depth=depth,
@@ -183,11 +255,27 @@ def geotherm(thicknesses=[20,20,60],depth=400,
         ax.set_xlabel('T (K)')
         ax.set_ylabel('Depth (km)')
     
+    if save==True:
+        output = pd.Series(data=np.concatenate((temps,heat_flows[0:-1]),axis=None),
+                           index=['ts1','ts2','ts3','ts4','qs1','qs2','qs3'])
+        
+        lith = np.sum(thicknesses)
+                                     
+        output.to_csv('thermal_'+str(lith)+'km.csv')
+    
     return(temps,heat_flows,z,tt)
 
 def pressure(z,rho,g=9.81):
     """
     Calculate pressure as a function of depth
+    
+    Parameters:
+        z: depth (m)
+        rho: density (kg/m^2)
+        g: gravitational accleration (m/s^2)
+    
+    Returns:
+        p: pressure (Pa or kg/m*s^2)
     """
     p = np.zeros(len(z))
     for i in range(1,len(z)):
