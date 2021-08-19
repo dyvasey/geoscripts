@@ -17,7 +17,8 @@ from geoscripts import latlon
 class Sample:
     """ Object to hold geologic sample data """
     # Basic attributes
-    def __init__(self,name,lat=None,lon=None,lithology=None,source=None):
+    def __init__(self,name,lat=None,lon=None,lithology=None,source=None,
+                 age=None):
         """
         Constructs necessary attributes for sample object.
         
@@ -27,6 +28,7 @@ class Sample:
             lon: Sample longitude (DD)
             lithology: Sample rock type
             source: Source of the sample
+            age: Age of the sample
             
         Returns:
             None
@@ -36,6 +38,7 @@ class Sample:
         self.lon = lon
         self.lithology = str(lithology)
         self.source = source
+        self.age = age
         
         return
     
@@ -155,10 +158,10 @@ class ProcessedSample(Sample):
     """
     Sample with additional data on thin sections and mineral separations        
     """
-    def __init__(self,name,lat,lon,lithology,source,
+    def __init__(self,name,lat,lon,lithology,source,age,
                  current_location=None,ts=False,separate=False,dz=None,
                  tchron=None,gchron=None):
-        super().__init__(name,lat,lon,lithology,source)
+        super().__init__(name,lat,lon,lithology,source,age)
         self.current_location = current_location
         self.ts = ts
         self.separate = separate
@@ -222,7 +225,8 @@ def process_sample(sample,current_location=None,ts=False,separate=False,dz=None,
     Convert sample to processed sample
     """
     psample = ProcessedSample(sample.name,sample.lat,sample.lon,
-                              sample.lithology,sample.source,current_location,
+                              sample.lithology,sample.source,sample.age,
+                              current_location,
                               ts,separate,dz,tchron,gchron)
 
     return(psample)    
