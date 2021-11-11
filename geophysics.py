@@ -260,8 +260,10 @@ def geotherm(thicknesses=[20,20,60],depth=400,
                            index=['ts1','ts2','ts3','ts4','qs1','qs2','qs3'])
         
         lith = np.sum(thicknesses)
+        
+        filename = 'thermal_' + str(lith) + '_' + str(depth) + '.csv'
                                      
-        output.to_csv('thermal_'+str(lith)+'km.csv')
+        output.to_csv(filename)
     
     return(temps,heat_flows,z,tt)
 
