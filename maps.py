@@ -247,11 +247,11 @@ def scalebar(length,slon='auto',slat='auto',az=90,label=True,ax=None,**kwargs):
     
     # Calculate endpoint for given distance
     end = geodesic.direct(
-        points=[slon,slat],azimuths=az,distances=length).base[0]
+        points=[slon,slat],azimuths=az,distances=length)[0]
     elon = end[0]
     elat = end[1]
     mid = geodesic.direct(
-        points=[slon,slat],azimuths=az,distances=length/2).base[0]
+        points=[slon,slat],azimuths=az,distances=length/2)[0]
     clon = mid[0]
     clat = mid[1]
     
@@ -309,7 +309,7 @@ def narrow(lon='auto',lat='auto',ax=None,lfactor=1,**kwargs):
     
     # Get arrow endpoint scaled by diff and lfactor
     end = geodesic.direct(
-        points=[lon,lat],azimuths=0,distances=lfactor*diff*2*10**4).base[0]
+        points=[lon,lat],azimuths=0,distances=lfactor*diff*2*10**4)[0]
 
     # Transform lat-lon into axes coordinates
     xstart,ystart = crs.transform_point(lon,lat,src_crs=ccrs.Geodetic())
