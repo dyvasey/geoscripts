@@ -2,12 +2,13 @@
 Module to import tables from PDF journal articles.
 """
 import tabula
+import camelot
 import pandas as pd
 from pdf2image import convert_from_path
 from PIL import Image
 import pytesseract
 
-def article(pdf,page,filename,**kwargs):
+def article(pdf,page,filename,directory='./',**kwargs):
     """
     Extract table from PDF article with tabula.
     
@@ -23,11 +24,11 @@ def article(pdf,page,filename,**kwargs):
         df: Pandas dataframe with table
     """
     # Must set to path with PDFs on local machine
-    path = "C:/Users/dyvas/Box Sync/JournalArticles/" + pdf + ".pdf"
+    path = directory + pdf + ".pdf"
 
-    dfs = tabula.read_pdf(path, pages=page,**kwargs)
+    dfs = camelot.read_pdf(path, pages=str(page),**kwargs)
     
-    df = dfs[0] # Convert to single dataframe
+    df = dfs[0].df # Convert to single dataframe
     
     outdir = './' + filename + '.csv'
     
@@ -35,7 +36,7 @@ def article(pdf,page,filename,**kwargs):
     
     return(df)
 
-def articleocr(pdf,page):
+def articleocr(pdf,page,directory='./'):
     """
     Extract table from PDF with no embedded text using OCR and tabula.
     
@@ -57,7 +58,7 @@ def articleocr(pdf,page):
     pytesseract.pytesseract.tesseract_cmd = tpath
     
     # Must set to path with PDFs on local machine
-    path = "C:/Users/dyvas/Box Sync/JournalArticles/" + pdf + ".pdf"
+    path = directory + pdf + ".pdf"
     
     # Convert PDF page to image
     image = convert_from_path(path,first_page=page,last_page=page)
@@ -69,8 +70,8 @@ def articleocr(pdf,page):
         f.write(file) # PDF type is bytes by default
         
     #Extract table with tabula
-    dfs = tabula.read_pdf('./'+ newpath,pages=1)
-    df = dfs[0] # Convert to single dataframe
+    dfs = camelot.read_pdf('./'+ newpath,pages='1')
+    df = dfs[0].df # Convert to single dataframe
     
     # Save .csv with extracted table
     outdir = './' + pdf + '_' + str(page) + '.csv'
