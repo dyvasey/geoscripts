@@ -246,6 +246,7 @@ def geotherm(thicknesses=[20,20,60],depth=400,
     
     print('LAB Depth       = ', sum(thicknesses), 'km')
     print('LAB Temperature = ', tt[sum(thicknesses)], 'K')
+    print('Bottom Temperature = ',tt[-1], 'K')
     
     if plot==True:
         fig = plt.figure()
@@ -256,8 +257,8 @@ def geotherm(thicknesses=[20,20,60],depth=400,
         ax.set_ylabel('Depth (km)')
     
     if save==True:
-        output = pd.Series(data=np.concatenate((temps,heat_flows[0:-1]),axis=None),
-                           index=['ts1','ts2','ts3','ts4','qs1','qs2','qs3'])
+        output = pd.Series(data=np.concatenate((temps,heat_flows[0:-1],tt[-1]),axis=None),
+                           index=['ts1','ts2','ts3','ts4','qs1','qs2','qs3','base'])
         
         lith = np.sum(thicknesses)
         
