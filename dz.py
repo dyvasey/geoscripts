@@ -163,7 +163,7 @@ class DZSample:
         
         sns.kdeplot(self.bestage,log_scale=log_scale,label=self.name,
                     ax=ax,shade=True,color=self.color,bw_adjust=bw_adjust,
-                    **kwargs)
+                    **kwargs).set(title=self.name)
         
         ax.spines['top'].set_visible(False)
         ax.spines['right'].set_visible(False)
