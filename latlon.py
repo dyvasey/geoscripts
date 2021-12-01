@@ -22,10 +22,19 @@ def dms2deg(latdeg,londeg,latmin,lonmin,latsec=0,lonsec=0):
     lat = (abs(latdeg) + (abs(latmin)+abs(latsec)/60)/60)
     lon = (abs(londeg) + (abs(lonmin)+abs(lonsec)/60)/60)
     
-    if latdeg<0:
-        lat = -lat
-    if londeg<0:
-        lon = -lon
+    if isinstance(latdeg,(int,float)):
+        if latdeg<0:
+            lat = -lat
+        if londeg<0:
+            lon = -lon
+    
+    else:
+        for k,l in enumerate(lat):
+            if latdeg[k]<0:
+                l = -l
+            if londeg[k]<0:
+                lon[k] = -lon[k]
+    
     return(lat,lon)
 
 def UTM2latlon(easting,northing,zone,south=False):
