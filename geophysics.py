@@ -389,6 +389,27 @@ def viscosity_profile(A,A_df,n,d,m,E,E_df,V,V_df,thicknesses=[20,20,60],
         plt.tight_layout()
     
     return(z,comp,disl,diff,tt)
+
+def byerlee(density,depth):
+    """
+    Calculate failure criterion from density and depth using Byerlee's Law.
+    Parameters
+    ----------
+    density: Density of material (kg/m^3)
+    depth : Depth of material (m)      
+    Returns
+    -------
+    tau : Shear stress (Pa)
+    """
+
+    g = 9.81 # m/s^2
+    lith_stress = density*g*depth # Pa (kg/m*s^2)
+    tau1 = 0.85*lith_stress # Pa
+    tau2 = 0.6*lith_stress+60e6 # Pa
+    
+    tau = np.where(lith_stress<=200e6,tau1,tau2)
+
+    return(tau)
     
     
     
