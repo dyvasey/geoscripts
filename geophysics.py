@@ -195,7 +195,7 @@ def adiab_geotherm(z,ast=1573,gravity=9.81,thermal_expansivity=2.e-5,
         
     return(ta)
 
-def geotherm(thicknesses=[20,20,60],depth=400,
+def geotherm(thicknesses=[20,20,60],depth=600,
              radiogenic_heat=[1.e-6,2.5e-7,0.],surface_t=273,
              heat_flow=0.05296,thermal_conductivity=2.5,ast=1573,gravity=9.81,
              thermal_expansivity=2.e-5,heat_capacity=750,plot=True,
@@ -266,7 +266,7 @@ def geotherm(thicknesses=[20,20,60],depth=400,
                                      
         output.to_csv(filename)
     
-    return(temps,heat_flows,z,tt)
+    return(temps,heat_flows,z,tt,tc,ta)
 
 def pressure(z,rho,g=9.81):
     """
@@ -311,21 +311,26 @@ def density_profile(z,thicknesses=[20,20,60],densities=[2700,2850,3300,3300],
     return(rho)
 
 def viscosity_profile(A,A_df,n,d,m,E,E_df,V,V_df,thicknesses=[20,20,60],
-                      densities=[2700,2850,3300,3300],heat_flow=0.05296,
-                    depth=400,strain_rate=1e-15,R=8.31451,plot=True):
+                      densities=[2800,2900,3300,3300],heat_flow=0.05296,
+                      thermal_expansivity=2.e-5,
+                    depth=600,strain_rate=1e-15,R=8.31451,plot=True):
     """
     Calculate composite viscosity profile using factors as reported to ASPECT.
     """
     # Calculate geotherm
-    temps,heat_flows,z,tt = geotherm(thicknesses=thicknesses,depth=depth,
-                                     heat_flow=heat_flow,plot=plot)
+    temps,heat_flows,z,tt,tc,ta = geotherm(thicknesses=thicknesses,depth=depth,
+                                     heat_flow=heat_flow,plot=plot,
+                                     thermal_expansivity=thermal_expansivity)
     
-    # Assign densities to array
+    # Assign input densities to array
     rho = density_profile(z=z,thicknesses=thicknesses,densities=densities,
                           depth=depth)
     
+    # Calculate densities using adiabatic profile
+    rho_adiab = adiab_density(rho,thermal_expansivity,tt,ta)
+    
     # Calculate pressure
-    p = pressure(z,rho)
+    p = pressure(z,rho_adiab)
     
     # Set boundary locations for slicing
     boundaries = [0,thicknesses[0],thicknesses[0]+thicknesses[1],
@@ -335,15 +340,15 @@ def viscosity_profile(A,A_df,n,d,m,E,E_df,V,V_df,thicknesses=[20,20,60],
     # Calculate dislocation and diffusion creep for each layer
     disl = np.zeros(len(z))
     diff = np.zeros(len(z))
-    #alt = np.zeros(len(z))
+
     disl_layers = []
     diff_layers = []
-    #alt_layers = []
+
     for x in range(len(A)):
         # Get slices for each layer
         disl_layers.append(disl[boundaries[x]:boundaries[x+1]])
         diff_layers.append(diff[boundaries[x]:boundaries[x+1]])
-        #alt_layers.append(alt[boundaries[x]:boundaries[x+1]])
+
         # Slice pressure and temperature arrays
         p_slice = p[boundaries[x]:boundaries[x+1]]
         t_slice = tt[boundaries[x]:boundaries[x+1]]
@@ -353,14 +358,11 @@ def viscosity_profile(A,A_df,n,d,m,E,E_df,V,V_df,thicknesses=[20,20,60],
         
         diff_layers[x] = visc_diffusion(A=A_df[x],m=m[x],d=d,E=E_df[x],P=p_slice,
                                         V=V_df[x],T=t_slice)
-        
-        #alt_layers[x] = visc_disl_alt(C=A[x],n=n[x],E=E[x],t=t_slice)
-        
+         
     
     # Recombine slices into single arrays
     disl = np.concatenate(disl_layers)
     diff = np.concatenate(diff_layers)
-    #alt = np.concatenate(alt_layers)
     
     
     # Calculate composite creep
@@ -410,6 +412,13 @@ def byerlee(density,depth):
     tau = np.where(lith_stress<=200e6,tau1,tau2)
 
     return(tau)
+
+def adiab_density(input_density,thermal_expansivity,temperature,reference_temp):
+    
+    output = input_density * (
+        1 - thermal_expansivity * (temperature - reference_temp))
+    
+    return(output)
     
     
     
