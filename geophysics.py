@@ -390,7 +390,7 @@ def viscosity_profile(A,A_df,n,d,m,E,E_df,V,V_df,thicknesses=[20,20,60],
             
         plt.tight_layout()
     
-    return(z,comp,disl,diff,tt)
+    return(z,comp,disl,diff,tt,p)
 
 def byerlee(density,depth):
     """
@@ -419,6 +419,13 @@ def adiab_density(input_density,thermal_expansivity,temperature,reference_temp):
         1 - thermal_expansivity * (temperature - reference_temp))
     
     return(output)
+
+def drucker_prager(pressure,internal_friction=30,cohesion=20):
+    friction_rad = np.radians(internal_friction)
+    cohesion_pa = cohesion*1e6
+    strength = pressure*np.sin(friction_rad) + cohesion_pa*np.cos(friction_rad)
+    
+    return(strength)
     
     
     
