@@ -11,6 +11,8 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import geopandas as gpd
 
+from matplotlib.colors import cnames
+
 class DZSample:
     """ Object to hold detrital zircon sample metadata and ages. """
     
@@ -109,7 +111,7 @@ class DZSample:
         
         return(self.bestage)
     
-    def kde(self,ax=None,log_scale=True,add_n=True,xaxis=True,
+    def kde(self,ax=None,log_scale=True,add_n=True,xaxis=True,rug=True,
             **kwargs):
         """
         Plot KDE via Seaborn using best age.
@@ -128,11 +130,18 @@ class DZSample:
             
         sns.kdeplot(self.bestage,log_scale=log_scale,label=self.name,
                     ax=ax,shade=True,color=self.color,**kwargs)
+        if rug == True:
+            sns.rugplot(self.bestage,ax=ax,height=-0.1,clip_on=False,
+                        color=self.color,expand_margins=False,
+                        linestyle='dotted',linewidth=2)
         
         ax.spines['top'].set_visible(False)
         ax.spines['right'].set_visible(False)
         ax.spines['left'].set_visible(False)
         ax.get_yaxis().set_visible(False)
+        
+        ax.set_xticks([100,200,300,400,500,1000,2000,3000])
+        ax.set_xticklabels([100,200,300,400,500,1000,2000,3000])
         
         if add_n == True:
             text = 'n = ' + str(self.bestage.count())
@@ -303,6 +312,7 @@ def write_file(samples,filename):
     reported_age = []
     kde_path = []
     source = []
+    color = []
     
     for sample in samples:
         latitude.append(sample.latlon[0])
@@ -311,10 +321,13 @@ def write_file(samples,filename):
         reported_age.append(sample.reported_age)
         kde_path.append(sample.kde_path)    
         source.append(sample.source)
+        
+        color_hex = cnames[sample.color]
+        color.append(color_hex)
     
     geometry = gpd.points_from_xy(longitude,latitude)
     data = {'name':name,'reported_age':reported_age,
-            'kde_path':kde_path,'source':source}
+            'kde_path':kde_path,'source':source,'color':color}
     gdf = gpd.GeoDataFrame(data,geometry=geometry)
     
     gdf.to_file(filename,crs='EPSG:4326')
