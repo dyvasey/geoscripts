@@ -3,10 +3,14 @@ Implement 1D KDE from Botev et al., 2010, after R and Matlab code from
 https://web.maths.unsw.edu.au/~zdravkobotev/ and R code from
 IsoplotR (Vermeesch,2018).
 """
+import os 
+
 import numpy as np
 from scipy import optimize,stats
 
 import rpy2.robjects as ro
+
+dz_dir = os.path.dirname(os.path.realpath(__file__))
 
 def py_kde(data,kde_min=None,kde_max=None):
     """
@@ -173,7 +177,8 @@ def botev_r(data):
     Calculate Botev bandwidth using modified version of R script from
     Botev et al., 2010.
     """
-    path = 'botev_mod.R'
+    path = os.path.join(dz_dir,'botev_mod.R')
+    print(path)
     r = ro.r
     r.source(path)
     
@@ -190,7 +195,8 @@ def vermeesch_r(data):
     Calculate Botev bandwidth using R script from
     IsoplotR
     """
-    path = 'vermeesch_botev.R'
+    path = os.path.join(dz_dir,'vermeesch_botev.R')
+    print(path)
     r = ro.r
     r.source(path)
     

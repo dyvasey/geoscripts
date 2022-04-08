@@ -10,7 +10,7 @@ import botev
 
 #%% Test Botev Algorithim
 
-data = np.genfromtxt('sample_data.csv',delimiter=',')
+data = np.genfromtxt('test_data.csv',delimiter=',')
 
 # Get each bandwidth
 grid,density,bandwidth = botev.py_kde(data)
