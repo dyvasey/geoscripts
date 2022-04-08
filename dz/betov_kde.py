@@ -26,12 +26,6 @@ def kde(data,kde_min=None,kde_max=None):
     if kde_max is None:
         kde_max = data_max + data_range/10
     
-    # Make n a power of two if needed
-    if not np.log2(n).is_integer():
-        print(n,' is not a power of 2')
-        n = 2**np.ceil(np.log2(n))
-        print('New n: ',n)
-    
     # Set up grid
     kde_range = kde_max - kde_min
     

@@ -13,6 +13,8 @@ import geopandas as gpd
 
 from matplotlib.colors import cnames
 
+from geoscripts.dz import betov_kde
+
 class DZSample:
     """ Object to hold detrital zircon sample metadata and ages. """
     
@@ -112,6 +114,7 @@ class DZSample:
         return(self.bestage)
     
     def kde(self,ax=None,log_scale=True,add_n=True,xaxis=True,rug=True,
+            betov=True,
             **kwargs):
         """
         Plot KDE via Seaborn using best age.
@@ -127,9 +130,19 @@ class DZSample:
         """
         if ax == None:
             ax = plt.gca()
+        
+        if betov==True:
+            grid,density,bandwidth = betov_kde.kde(self.bestage)
+            std = self.bestage.std()
+            bw_method = bandwidth/std
+            print(bw_method)
+        # Use Seaborn default
+        else:
+            bw_method = 'scott'
             
         sns.kdeplot(self.bestage,log_scale=log_scale,label=self.name,
-                    ax=ax,shade=True,color=self.color,**kwargs)
+                    ax=ax,shade=True,color=self.color,
+                    bw_method=bw_method,**kwargs)
         if rug == True:
             sns.rugplot(self.bestage,ax=ax,height=-0.1,clip_on=False,
                         color=self.color,expand_margins=False,
