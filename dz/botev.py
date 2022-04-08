@@ -1,13 +1,19 @@
 """
-Implement 1D KDE from Betov et al., 2010, after R and Matlab code from 
-https://web.maths.unsw.edu.au/~zdravkobotev/. Also uses code elements from
+Implement 1D KDE from Botev et al., 2010, after R and Matlab code from 
+https://web.maths.unsw.edu.au/~zdravkobotev/ and R code from
 IsoplotR (Vermeesch,2018).
 """
-
 import numpy as np
 from scipy import optimize,stats
 
-def kde(data,kde_min=None,kde_max=None):
+import rpy2.robjects as ro
+
+def py_kde(data,kde_min=None,kde_max=None):
+    """
+    Pythonic implementation of Botev et al., 2010 algorithim. Very hard to
+    get to work with SciPy solvers, so currently deprecated in preference
+    of R-based solutions in other functions.
+    """
     
     #fsolve will fail if using another n.
     n=512
@@ -54,10 +60,10 @@ def kde(data,kde_min=None,kde_max=None):
     I = np.arange(1,n)**2
     a2 = (a[1:n+1]/2)**2
     
-    bnds = (0,0.1)
-    
     # This struggles and may need revision.
-    t_star = optimize.fsolve(fixed_point,0,args=(unique_datapoints,I,a2))
+    t_star = optimize.minimize_scalar(fixed_point,bounds=(0,0.1),
+                            args=(unique_datapoints,I,a2),tol=1e-22,
+                            method='bounded').x
     
     print(t_star)
     
@@ -72,9 +78,12 @@ def kde(data,kde_min=None,kde_max=None):
     # This is related to rescaling of data
     bandwidth = np.sqrt(t_star)*kde_range
     
-    return(xgrid[0:-1],density,bandwidth[0])
+    return(xgrid[0:-1],density,bandwidth)
     
 def discrete_cosine_transform(data):
+    """
+    DCT in support of py_kde function
+    """
     data_length = len(data)
     weight_initial = np.array([1])
     
@@ -94,14 +103,16 @@ def discrete_cosine_transform(data):
     return(data_transformed)
 
 def inverse_dct(data):
+    """
+    DCT in support of py_kde function
+    """
     data_length = len(data)
     entries = np.arange(0,data_length)
     
     weights = data_length * np.exp(1j*entries*np.pi/(2*data_length))
     
-    # Note, in R script, this has to be divided by data_length, which gives
-    # same output as below.
-    data_transformed = np.real(np.fft.ifft(weights*data))
+    # Note, norm='forward' needed to match output of R fft inverse
+    data_transformed = np.real(np.fft.ifft(weights*data,norm='forward'))/data_length
     
     # Reorder the data
     output = np.zeros(data_length)
@@ -114,26 +125,29 @@ def inverse_dct(data):
 
 def fixed_point(t,N,I,a2):
     """
+    Fixed Point function in support of py_kde
+    
     From Betov code:
     this implements the function t-zeta*gamma^[l](t)
-
-    No absolute value in this version (after Betov matlab and Vermeesch,
-    but Betov R version has it)    
+ 
     """
     l = 7
-    f = 2 * (np.pi**(2*l)) * np.sum((I**l)*a2*np.exp(-I*np.pi**2*t))
+    f = 2 * (np.pi**(2*l)) * np.sum((I**l)*a2*np.exp(-I*(np.pi**2)*t))
     
     for s in np.arange(l-1,1,-1):
         K0 = np.prod(np.arange(1,2*s,2))/np.sqrt(2*np.pi)
         const = (1+(1/2)**(s+1/2))/3
         time = (2*const*K0/N/f)**(2/(3+2*s))
-        f = 2*np.pi**(2*s)*np.sum(I**s*a2*np.exp(-I*np.pi**2*time))
+        f = 2*np.pi**(2*s)*np.sum(I**s*a2*np.exp(-I*(np.pi**2)*time))
     
     out = t - (2*N*np.sqrt(np.pi)*f)**(-2/5)
-    return(out)
+    return(abs(out))
 
 
 def pilot_density(data,bandwidth):
+    """
+    Pilot density function in support of adaptive_kde after IsoplotR.
+    """
     data_length = len(data)
     
     density = np.zeros(data_length)
@@ -143,7 +157,9 @@ def pilot_density(data,bandwidth):
     return(density)
 
 def adaptive_kde(data,bandwidth):
-    
+    """
+    Determine adaptive KDE bandwidth factor after IsoplotR and Abramson, 1982.
+    """
     density = pilot_density(data,bandwidth)
     density_mean = stats.gmean(density)
     
@@ -151,5 +167,39 @@ def adaptive_kde(data,bandwidth):
     factor = np.sqrt(density_mean/density)
     
     return(factor)
+
+def botev_r(data):
+    """
+    Calculate Botev bandwidth using modified version of R script from
+    Botev et al., 2010.
+    """
+    path = 'botev_mod.R'
+    r = ro.r
+    r.source(path)
+    
+    rdata = ro.vectors.FloatVector(data)
+    
+    rbandwidth = r.kde(rdata)
+    
+    bandwidth = np.asarray(rbandwidth)[0]
+    
+    return(bandwidth)
+
+def vermeesch_r(data):
+    """
+    Calculate Botev bandwidth using R script from
+    IsoplotR
+    """
+    path = 'vermeesch_botev.R'
+    r = ro.r
+    r.source(path)
+    
+    rdata = ro.vectors.FloatVector(data)
+    
+    rbandwidth = r.botev(rdata)
+    
+    bandwidth = np.asarray(rbandwidth)[0]
+    
+    return(bandwidth)
         
     
