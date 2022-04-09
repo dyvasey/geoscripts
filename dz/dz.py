@@ -44,7 +44,7 @@ class DZSample:
         
         return
 
-    def calc_discordance(self,col_238,col_207,cutoff=20,reverse_cutoff=-5,
+    def calc_discordance(self,col_238,col_207,cutoff=10,reverse_cutoff=-10,
                          age_cutoff=400):
         """
         Calculate discordance of 238U/206Pb and 207Pb/206Pb ages.
@@ -75,7 +75,7 @@ class DZSample:
         return(discordance,discard)    
 
     def calc_bestage(self,col_238,col_207,age_cutoff=900,filter_disc=True,
-                     disc_cutoff=20,reverse_cutoff=-5,disc_age_cutoff=400):
+                     disc_cutoff=10,reverse_cutoff=-10,disc_age_cutoff=400):
         """
         Determine best age from 238U/206Pb and 207Pb/206Pb ages.
         
@@ -140,32 +140,28 @@ class DZSample:
         if method=='botev_r':
             bandwidth = botev.botev_r(self.bestage)
             bw_method = bandwidth/std
-            print(bw_method)
         
         # Botev Python script - currently doesn't work
         elif method=='botev_py':
             print('Warning: Method may be unstable.')
             grid,density,bandwidth = botev.py_kde(self.bestage)
             bw_method = bandwidth/std
-            print(bw_method)
             
         elif method=='vermeesch':
             bandwidth = botev.vermeesch_r(self.bestage)
             bw_method = bandwidth/std
-            print(bw_method)
             
         # Use Seaborn default
         else:
             bw_method = 'scott'
-            print(bw_method)
             
         sns.kdeplot(self.bestage,log_scale=log_scale,label=self.name,
                     ax=ax,shade=True,color=self.color,
                     bw_method=bw_method,**kwargs)
         if rug == True:
-            sns.rugplot(self.bestage,ax=ax,height=-0.1,clip_on=False,
+            sns.rugplot(self.bestage,ax=ax,height=-0.025,clip_on=False,
                         color=self.color,expand_margins=False,
-                        linestyle='dotted',linewidth=2)
+                        linewidth=2)
         
         ax.spines['top'].set_visible(False)
         ax.spines['right'].set_visible(False)
@@ -184,7 +180,7 @@ class DZSample:
         
         return(ax)
     
-    def kde_img(self,log_scale=True,add_n=True,bw_adjust=0.2,xlim=(10,4000),
+    def kde_img(self,log_scale=True,add_n=True,method='botev_r',xlim=(10,4000),
                 **kwargs):
         """
         Save KDE as image file tied to dz object.
@@ -202,18 +198,21 @@ class DZSample:
         ax = fig.add_subplot(111)
         ax.set_xlim(xlim)
         
-        sns.kdeplot(self.bestage,log_scale=log_scale,label=self.name,
-                    ax=ax,shade=True,color=self.color,bw_adjust=bw_adjust,
-                    **kwargs).set(title=self.name)
+        self.kde(ax=ax,log_scale=log_scale,add_n=add_n,method=method,
+                 **kwargs)
         
-        ax.spines['top'].set_visible(False)
-        ax.spines['right'].set_visible(False)
-        ax.spines['left'].set_visible(False)
-        ax.get_yaxis().set_visible(False)
+        #sns.kdeplot(self.bestage,log_scale=log_scale,label=self.name,
+        #            ax=ax,shade=True,color=self.color,bw_adjust=bw_adjust,
+        #            **kwargs).set(title=self.name)
         
-        if add_n == True:
-            text = 'n = ' + str(self.bestage.count())
-            ax.text(0.02,0.5,text,transform=ax.transAxes,fontweight='bold')
+        #ax.spines['top'].set_visible(False)
+        #ax.spines['right'].set_visible(False)
+        #ax.spines['left'].set_visible(False)
+        #ax.get_yaxis().set_visible(False)
+        
+        #if add_n == True:
+        #    text = 'n = ' + str(self.bestage.count())
+        #    ax.text(0.02,0.5,text,transform=ax.transAxes,fontweight='bold')
         
         path = 'dz/'
         os.makedirs(path,exist_ok=True)
@@ -312,7 +311,7 @@ def composite(samples,name,color=None):
     
     return(comp)
 
-def load(filename):
+def load(filename,path='dz/'):
     """
     Load .dz file into DZ object.
     
@@ -322,7 +321,6 @@ def load(filename):
     Returns:
         dz: DZ object with loaded data.
     """
-    path = 'dz/'
     dz = pickle.load(open(path+filename,"rb"))
     
     return(dz)
@@ -378,7 +376,7 @@ def load_all(path='dz/'):
     samples = []
     for file in os.listdir(path):
         if file.endswith('.dz'):
-            obj = load(file)
+            obj = load(file,path=path)
             samples.append(obj)
     
     return(samples)

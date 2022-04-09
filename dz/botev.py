@@ -6,6 +6,7 @@ IsoplotR (Vermeesch,2018).
 import os 
 
 import numpy as np
+import pandas as pd
 from scipy import optimize,stats
 
 import rpy2.robjects as ro
@@ -178,10 +179,14 @@ def botev_r(data):
     Botev et al., 2010.
     """
     path = os.path.join(dz_dir,'botev_mod.R')
-    print(path)
+
     r = ro.r
     r.source(path)
-    
+
+    if isinstance(data,pd.Series):
+        data.dropna(how='any',inplace=True)
+        data = data.to_numpy()
+
     rdata = ro.vectors.FloatVector(data)
     
     rbandwidth = r.kde(rdata)
@@ -196,9 +201,13 @@ def vermeesch_r(data):
     IsoplotR
     """
     path = os.path.join(dz_dir,'vermeesch_botev.R')
-    print(path)
+
     r = ro.r
     r.source(path)
+
+    if isinstance(data,pd.Series):
+        data.dropna(how='any',inplace=True)
+        data = data.to_numpy()
     
     rdata = ro.vectors.FloatVector(data)
     
