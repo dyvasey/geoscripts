@@ -151,6 +151,8 @@ class DZSample:
             bandwidth = botev.vermeesch_r(self.bestage)
             bw_method = bandwidth/std
             
+            print(bandwidth,std,bw_method)
+            
         # Use Seaborn default
         else:
             bw_method = 'scott'
