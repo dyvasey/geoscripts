@@ -19,9 +19,12 @@ bandwidth_vermeesch = botev.vermeesch_r(data)
 
 print(bandwidth,bandwidth_botev_r,bandwidth_vermeesch)
 
-fig,axs = plt.subplots(5,sharex=True,sharey=True,dpi=300,
-                       figsize=(8.5,11))
+data_log = np.log10(data)
+std_log = data_log.std()
+bandwidth_log = botev.vermeesch_r(data_log)
 
+fig,axs = plt.subplots(5,dpi=300,sharex=True,sharey=True,
+                       figsize=(8.5,11))
 std = data.std()
 sns.kdeplot(data,ax=axs[0],bw_method=bandwidth/std)
 axs[0].set_title('PyBotev - Seaborn')
@@ -45,3 +48,13 @@ sns.kdeplot(data,ax=axs[4],bw_method=bandwidth/std,weights=bw_weights/std)
 axs[4].set_title('Seaborn Adaptive - PyBotev')
 
 plt.tight_layout()
+
+#%% Test Log Scale
+
+fig,axs = plt.subplots(2,dpi=300,
+                       figsize=(8.5,11))
+
+sns.kdeplot(data_log,ax=axs[0],bw_method=bandwidth_log/std_log)
+sns.kdeplot(data,ax=axs[1],bw_method=bandwidth_log/std_log,log_scale=True)
+
+

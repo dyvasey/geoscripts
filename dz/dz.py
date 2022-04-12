@@ -133,22 +133,29 @@ class DZSample:
         if ax == None:
             ax = plt.gca()
         
-        # STD of sample
-        std = self.bestage.std()
+        # Transform data to log scale if needed for bandwidth calculation
+        if log_scale==True:
+            data_bw = np.log10(self.bestage)
+        else:
+            data_bw = self.bestage
+        
+        # STD of sample - transformed to log scale if needed - needed to
+        # feed bandwidth factor to Seaborn
+        std = data_bw.std()
         
         # Botev R script
         if method=='botev_r':
-            bandwidth = botev.botev_r(self.bestage)
+            bandwidth = botev.botev_r(data_bw)
             bw_method = bandwidth/std
         
         # Botev Python script - currently doesn't work
         elif method=='botev_py':
             print('Warning: Method may be unstable.')
-            grid,density,bandwidth = botev.py_kde(self.bestage)
+            grid,density,bandwidth = botev.py_kde(data_bw)
             bw_method = bandwidth/std
             
         elif method=='vermeesch':
-            bandwidth = botev.vermeesch_r(self.bestage)
+            bandwidth = botev.vermeesch_r(data_bw)
             bw_method = bandwidth/std
             
             print(bandwidth,std,bw_method)
@@ -156,6 +163,7 @@ class DZSample:
         # Use Seaborn default
         else:
             bw_method = 'scott'
+            
             
         sns.kdeplot(self.bestage,log_scale=log_scale,label=self.name,
                     ax=ax,shade=True,color=self.color,
