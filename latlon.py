@@ -61,3 +61,14 @@ def UTM2latlon(easting,northing,zone,south=False):
                                           southern_hemisphere=south))
     
     return(lat,lon)
+
+def latlon2UTM(latitude,longitude,zone,south=False):
+    
+    # Set ouptput to UTM
+    crs = ccrs.UTM(zone=zone,southern_hemisphere=south)
+    
+    # Convert
+    easting,northing = crs.transform_point(
+        longitude,latitude,src_crs=ccrs.Geodetic())
+    
+    return(easting,northing)
