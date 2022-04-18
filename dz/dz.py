@@ -232,6 +232,44 @@ class DZSample:
         
         return
     
+    def cad(self,ax=None,depage=None,**kwargs):
+        """
+        Plot cumulative age distribution
+        """
+        if ax == None:
+            ax = plt.gca()
+        
+        if depage == None:
+            sns.ecdfplot(self.bestage,ax=ax,label=self.name,
+                         **kwargs)
+            
+        elif depage == 'youngest':
+            norm_ages = self.bestage - np.min(self.bestage)
+            sns.ecdfplot(norm_ages,ax=ax,label=self.name,
+                         **kwargs)
+        
+        else:
+            norm_ages = self.bestage - depage
+            sns.ecdfplot(norm_ages,ax=ax,label=self.name,
+                         **kwargs)
+        
+        return(ax)
+    
+    def cawood_classify(self,depage='youngest'):
+        
+        if depage == 'youngest':
+            depage = np.min(self.bestage)
+        
+        norm_ages = self.bestage - depage
+        
+        ages_sorted = np.sort(norm_ages)
+        
+        cumden = np.arange(len(ages_sorted))/len(ages_sorted)
+        
+        step1 = np.where(cumden>=0.05)
+        
+        return(step1)
+        
     def map_location(self,ax=None,crs=ccrs.PlateCarree(),**kwargs):
         """
         Add sample location to map with Cartopy.
