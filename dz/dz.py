@@ -114,7 +114,7 @@ class DZSample:
         return(self.bestage)
     
     def kde(self,ax=None,log_scale=True,add_n=True,xaxis=True,rug=True,
-            method='botev_r',
+            method='vermeesch',
             **kwargs):
         """
         Plot KDE via Seaborn using best age.
@@ -166,7 +166,7 @@ class DZSample:
             
             
         sns.kdeplot(self.bestage,log_scale=log_scale,label=self.name,
-                    ax=ax,shade=True,color=self.color,
+                    ax=ax,shade=True,color=self.color,gridsize=1000,
                     bw_method=bw_method,**kwargs)
         if rug == True:
             sns.rugplot(self.bestage,ax=ax,height=-0.05,clip_on=False,
