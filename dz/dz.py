@@ -255,7 +255,10 @@ class DZSample:
         
         return(ax)
     
-    def cawood_classify(self,depage='youngest'):
+    def cawood_classify(self,depage='youngest',plot=False):
+        """
+        Classify sample using Cawood et al., 2012 framework.
+        """
         
         if depage == 'youngest':
             depage = np.min(self.bestage)
@@ -266,9 +269,53 @@ class DZSample:
         
         cumden = np.arange(len(ages_sorted))/len(ages_sorted)
         
-        step1 = np.where(cumden>=0.05)
+        # Get age where 5% density reached
+        step1_index = np.min(np.where(cumden>=0.05))
+        step1_age = ages_sorted[step1_index]
         
-        return(step1)
+        if step1_age >= 150:
+            self.cawood = 'extensional'
+            
+            text = self.name + '\n' + str(step1_age) + '\n' + self.cawood
+        
+        # Get age where 30% density reached
+        elif step1_age < 150:
+            step2_index = np.min(np.where(cumden>=0.3))
+            step2_age = ages_sorted[step2_index]
+            
+            if step2_age >= 100:
+                self.cawood = 'collisional'
+            
+            elif step2_age < 100:
+                self.cawood = 'convergent'
+                
+            else:
+                raise('Something went wrong')
+            
+            text = (
+                self.name + '\n' + str(step1_age) + ', ' + 
+                str(step2_age) + '\n' + self.cawood
+                )
+            
+        else:
+            raise('Something went wrong')
+        
+        if plot:
+            color_dict = {'convergent':'red','collisional':'blue',
+                          'extensional':'green'}
+            
+            fig,ax = plt.subplots(1)
+            ax.step(ages_sorted,cumden, color=color_dict[self.cawood])
+            ax.annotate(text,xy=(500,0.2))
+            
+            ax.axhline(0.05,color='blue')
+            ax.axhline(0.3,color='red')
+            ax.axvline(150,color='blue')
+            ax.axvline(100,color='red')    
+            
+            ax.set_xlim(0,3000)
+            ax.set_ylim(0,1)
+        return
         
     def map_location(self,ax=None,crs=ccrs.PlateCarree(),**kwargs):
         """
