@@ -114,7 +114,7 @@ class DZSample:
         return(self.bestage)
     
     def kde(self,ax=None,log_scale=True,add_n=True,xaxis=True,rug=True,
-            method='vermeesch',
+            method='vermeesch',ticks=[100,200,300,400,500,1000,2000,3000],
             **kwargs):
         """
         Plot KDE via Seaborn using best age.
@@ -178,8 +178,8 @@ class DZSample:
         ax.spines['left'].set_visible(False)
         ax.get_yaxis().set_visible(False)
         
-        ax.set_xticks([100,200,300,400,500,1000,2000,3000])
-        ax.set_xticklabels([100,200,300,400,500,1000,2000,3000])
+        ax.set_xticks(ticks)
+        ax.set_xticklabels(ticks)
         
         if add_n == True:
             text = 'n = ' + str(self.bestage.count())
