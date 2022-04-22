@@ -13,7 +13,7 @@ import geopandas as gpd
 
 from matplotlib.colors import cnames
 
-from geoscripts.dz import botev
+from geoscripts.dz import botev,mda
 
 class DZSample:
     """ Object to hold detrital zircon sample metadata and ages. """
@@ -328,36 +328,42 @@ class DZSample:
             ax.set_ylim(0,1)
         return
     
-    def calc_mda(self,grains=[0,1,2],plot=True):
+    def calc_mda(self,method='ygc2sig',grains=[0,1,2],plot=True):
         """
         Calculate and plot maximum depositional age using selected grains
         """
         age_errors = pd.concat([self.bestage,self.besterror],axis=1)
         ages_sorted = age_errors.sort_values(by=['Best Age'],ignore_index=True)
-        
-        mda_ages = ages_sorted.loc[grains,'Best Age']
         err_lev = self.error_level
-        mda_errors = ages_sorted.loc[grains,err_lev]
         
-        weights = 1/mda_errors**2
-        
-        self.mda = np.average(mda_ages,weights=weights)
-        self.mda_err = 1/np.sqrt(np.sum(weights))
-        
-        deg_free = len(grains)-1
-        
-        if err_lev=='2sig':
-            errors_1sig = mda_errors/2
-        
-        elif err_lev =='1sig':
-            errors_1sig = mda_errors
+        if method=='ygc2sig':
+            self.mda,self.mda_err,self.mda_mswd,mda_ages,mda_errors = mda.ygc2sig(ages_sorted,err_lev)
         
         else:
-            raise('Error level not valid')
-        
-        squares_summed = np.sum(((mda_ages-self.mda)/errors_1sig)**2)
-        
-        self.mda_mswd = squares_summed/deg_free
+            print('manual')
+            mda_ages = ages_sorted.loc[grains,'Best Age']
+    
+            mda_errors = ages_sorted.loc[grains,err_lev]
+            
+            weights = 1/mda_errors**2
+            
+            self.mda = np.average(mda_ages,weights=weights)
+            self.mda_err = 1/np.sqrt(np.sum(weights))
+            
+            deg_free = len(grains)-1
+            
+            if err_lev=='2sig':
+                errors_1sig = mda_errors/2
+            
+            elif err_lev =='1sig':
+                errors_1sig = mda_errors
+            
+            else:
+                raise('Error level not valid')
+            
+            squares_summed = np.sum(((mda_ages-self.mda)/errors_1sig)**2)
+            
+            self.mda_mswd = squares_summed/deg_free
         
         if plot==True:
             fig,ax = plt.subplots(1,dpi=300)
