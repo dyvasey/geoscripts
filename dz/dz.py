@@ -74,7 +74,8 @@ class DZSample:
         
         return(discordance,discard)    
 
-    def calc_bestage(self,col_238,col_207,age_cutoff=900,filter_disc=True,
+    def calc_bestage(self,col_238,col_207,err_238=None,err_207=None,
+                     age_cutoff=900,filter_disc=True,use_err=False,err_lev='2sig',
                      disc_cutoff=10,reverse_cutoff=-10,disc_age_cutoff=400):
         """
         Determine best age from 238U/206Pb and 207Pb/206Pb ages.
@@ -99,17 +100,27 @@ class DZSample:
         self.bestage = self.agedata[col_238].where(
             self.agedata[col_238]<age_cutoff,
             self.agedata[col_207])
-        
+            
         # Run discordance filter
         if filter_disc == True:
             discordance,discard = self.calc_discordance(
                 col_238,col_207,cutoff=disc_cutoff,
                 reverse_cutoff=reverse_cutoff,age_cutoff=disc_age_cutoff
                                                    )
-            self.bestage = self.bestage[~discard]  
-        
-        
+            self.bestage = self.bestage[~discard]
+            
         self.bestage.name = 'Best Age'
+        
+        if use_err == True:
+            self.besterror = self.agedata[err_238].where(
+                self.agedata[col_238]<age_cutoff,
+                self.agedata[err_207])
+            
+            if filter_disc == True:
+                self.besterror = self.besterror[~discard]
+            self.error_level = err_lev
+            self.besterror.name = err_lev
+        
         
         return(self.bestage)
     
@@ -316,6 +327,42 @@ class DZSample:
             ax.set_xlim(0,3000)
             ax.set_ylim(0,1)
         return
+    
+    def calc_mda(self,grains=[0,1,2],plot=True):
+        """
+        Calculate and plot maximum depositional age using selected grains
+        """
+        age_errors = pd.concat([self.bestage,self.besterror],axis=1)
+        ages_sorted = age_errors.sort_values(by=['Best Age'],ignore_index=True)
+        
+        mda_ages = ages_sorted.loc[grains,'Best Age']
+        err_lev = self.error_level
+        mda_errors = ages_sorted.loc[grains,err_lev]
+        
+        weights = 1/mda_errors**2
+        
+        self.mda = np.average(mda_ages,weights=weights)
+        self.mda_err = 1/np.sqrt(np.sum(weights))
+        
+        deg_free = len(grains)-1
+        
+        if err_lev=='2sig':
+            errors_1sig = mda_errors/2
+        
+        elif err_lev =='1sig':
+            errors_1sig = mda_errors
+        
+        else:
+            raise('Error level not valid')
+        
+        squares_summed = np.sum(((mda_ages-self.mda)/errors_1sig)**2)
+        
+        self.mda_mswd = squares_summed/deg_free
+        
+        if plot==True:
+            fig,ax = plt.subplots(1)
+        
+        return
         
     def map_location(self,ax=None,crs=ccrs.PlateCarree(),**kwargs):
         """
@@ -476,8 +523,6 @@ def load_all(path='dz/'):
     
     return(samples)
             
-    
-        
-            
+
             
         
