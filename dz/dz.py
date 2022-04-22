@@ -367,7 +367,7 @@ class DZSample:
         
         if plot==True:
             fig,ax = plt.subplots(1,dpi=300)
-            x = np.arange(len(grains)).astype(str)
+            x = np.arange(len(mda_ages)).astype(str)
             ax.errorbar(x,mda_ages,yerr=mda_errors,fmt='none',
                         linewidth=10)
             ax.axhline(self.mda,color='black',linewidth=1)
