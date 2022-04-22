@@ -328,7 +328,7 @@ class DZSample:
             ax.set_ylim(0,1)
         return
     
-    def calc_mda(self,method='ygc2sig',grains=[0,1,2],plot=True):
+    def calc_mda(self,method='ygc2sig',grains=None,plot=True):
         """
         Calculate and plot maximum depositional age using selected grains
         """
@@ -337,38 +337,44 @@ class DZSample:
         err_lev = self.error_level
         
         if method=='ygc2sig':
-            self.mda,self.mda_err,self.mda_mswd,mda_ages,mda_errors = mda.ygc2sig(ages_sorted,err_lev)
+            (self.mda,self.mda_err,self.mda_mswd,
+             self.mda_ages,self.mda_errors,self.mda_success) = mda.ygc2sig(ages_sorted,err_lev)
+            if self.mda_success==False:
+                print('3 grains at 2 sigma did not succeed. Trying 2 grains at 1 sigma')
+                method = 'ygc1sig'
         
-        else:
-            print('manual')
-            mda_ages = ages_sorted.loc[grains,'Best Age']
+        if method=='ygc1sig':
+            self.mda,self.mda_err,self.mda_mswd,self.mda_ages,self.mda_errors = mda.ygc1sig(ages_sorted,err_lev)  
+            
+        if method=='manual':
+            self.mda_ages = ages_sorted.loc[grains,'Best Age']
     
-            mda_errors = ages_sorted.loc[grains,err_lev]
+            self.mda_errors = ages_sorted.loc[grains,err_lev]
             
-            weights = 1/mda_errors**2
+            weights = 1/self.mda_errors**2
             
-            self.mda = np.average(mda_ages,weights=weights)
+            self.mda = np.average(self.mda_ages,weights=weights)
             self.mda_err = 1/np.sqrt(np.sum(weights))
             
             deg_free = len(grains)-1
             
             if err_lev=='2sig':
-                errors_1sig = mda_errors/2
+                errors_1sig = self.mda_errors/2
             
             elif err_lev =='1sig':
-                errors_1sig = mda_errors
+                errors_1sig = self.mda_errors
             
             else:
                 raise('Error level not valid')
             
-            squares_summed = np.sum(((mda_ages-self.mda)/errors_1sig)**2)
+            squares_summed = np.sum(((self.mda_ages-self.mda)/errors_1sig)**2)
             
             self.mda_mswd = squares_summed/deg_free
         
         if plot==True:
             fig,ax = plt.subplots(1,dpi=300)
-            x = np.arange(len(mda_ages)).astype(str)
-            ax.errorbar(x,mda_ages,yerr=mda_errors,fmt='none',
+            x = np.arange(len(self.mda_ages)).astype(str)
+            ax.errorbar(x,self.mda_ages,yerr=self.mda_errors,fmt='none',
                         linewidth=10)
             ax.axhline(self.mda,color='black',linewidth=1)
             ax.axhspan(ymin=self.mda-self.mda_err,ymax=self.mda+self.mda_err,
