@@ -169,8 +169,6 @@ class DZSample:
             bandwidth = botev.vermeesch_r(data_bw)
             bw_method = bandwidth/std
             
-            print(bandwidth,std,bw_method)
-            
         # Use Seaborn default
         else:
             bw_method = 'scott'
@@ -344,7 +342,8 @@ class DZSample:
                 method = 'ygc1sig'
         
         if method=='ygc1sig':
-            self.mda,self.mda_err,self.mda_mswd,self.mda_ages,self.mda_errors = mda.ygc1sig(ages_sorted,err_lev)  
+            (self.mda,self.mda_err,self.mda_mswd,
+            self.mda_ages,self.mda_errors,self.mda_success) = mda.ygc1sig(ages_sorted,err_lev)  
             
         if method=='manual':
             self.mda_ages = ages_sorted.loc[grains,'Best Age']
@@ -373,21 +372,9 @@ class DZSample:
         
         if plot==True:
             fig,ax = plt.subplots(1,dpi=300)
-            x = np.arange(len(self.mda_ages)).astype(str)
-            ax.errorbar(x,self.mda_ages,yerr=self.mda_errors,fmt='none',
-                        linewidth=10)
-            ax.axhline(self.mda,color='black',linewidth=1)
-            ax.axhspan(ymin=self.mda-self.mda_err,ymax=self.mda+self.mda_err,
-                       color='grey',alpha=0.5)
-            annotation = (
-                self.name +
-                '\nWeighted Mean:\n' + str(round(self.mda,1)) 
-                + ' +/- ' + str(round(self.mda_err,1)) 
-                + ' Ma ' + err_lev + '\nMSWD: ' + str(round(self.mda_mswd,1))
-                )
-            
-            ax.annotate(annotation,xy=(0.6,0.15),xycoords='axes fraction')
-            ax.set_xlabel('Age (Ma)')
+            mda.plot_weighted_mean(self.mda_ages,self.mda_errors,self.mda,
+                                   self.mda_err,self.mda_mswd,err_lev=err_lev,
+                                   ax=ax,label=self.name)
         
         return
         

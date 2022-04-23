@@ -3,6 +3,7 @@ Algorithims for automatic MDA calculation
 """
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 
 from itertools import combinations
 
@@ -31,7 +32,30 @@ def weighted_mean(ages,errors,err_lev='2sig'):
     mswd = squares_summed/deg_free
     
     return(wmean,werror,mswd)
+
+def plot_weighted_mean(ages,errors,mean,mean_error,mswd,err_lev='2sig',ax=None, 
+                       label='Sample',**kwargs):
     
+    if ax is None:
+        ax = plt.gca()
+    
+    x = np.arange(len(ages)).astype(str)
+    ax.errorbar(x,ages,yerr=errors,fmt='none',
+                linewidth=10,**kwargs)
+    ax.axhline(mean,color='black',linewidth=1)
+    ax.axhspan(ymin=mean-mean_error,ymax=mean+mean_error,
+               color='grey',alpha=0.5)
+    annotation = (
+        label +
+        '\nWeighted Mean:\n' + str(round(mean,1)) 
+        + ' +/- ' + str(round(mean_error,1)) 
+        + ' Ma ' + err_lev + '\nMSWD: ' + str(round(mswd,1))
+        )
+    
+    ax.annotate(annotation,xy=(0.6,0.15),xycoords='axes fraction')
+    ax.set_ylabel('Age (Ma)')
+    
+    return(ax)
     
 def ygc2sig(ages,err_lev='2sig'):
     """
@@ -141,6 +165,7 @@ def ygc1sig(ages,err_lev='2sig'):
     all_overlap = False
     force = False
     add_grain = False
+    success=True
     
     # Start with youngest 2 grains
     ngrains = 2
@@ -224,8 +249,9 @@ def ygc1sig(ages,err_lev='2sig'):
         
         # Break the loop here if the force flag is on
         if force==True:
+            success=False
             break
         
         
-    return(wmean,werror,mswd,ages_only,errors_only)
+    return(wmean,werror,mswd,ages_only,errors_only,success)
     
