@@ -64,13 +64,13 @@ class DZSample:
         """
         discordance = (
             1-(self.agedata[col_238]/self.agedata[col_207]))*100
-        self.agedata['Discordance'] = discordance
+        self.agedata.loc[:,'Discordance'] = discordance
         
         # Run filter
         discard = ((self.agedata[col_238]>age_cutoff) &
             ((discordance>cutoff) | (discordance<reverse_cutoff))
             )
-        self.agedata['Discard'] = discard
+        self.agedata.loc[:,'Discard'] = discard
         
         return(discordance,discard)    
 
@@ -199,7 +199,32 @@ class DZSample:
         
         return(ax)
     
-    def kde_img(self,log_scale=True,add_n=True,method='botev_r',xlim=(10,4000),
+    def plot_agehf(self,hf_col,ax=None,**kwargs):
+        if ax == None:
+            ax = plt.gca()
+        
+        hf = self.agedata[hf_col].dropna(how='any')
+        ages = self.bestage[hf.index]
+        ax.scatter(ages,hf,**kwargs)
+        
+        return(ax)
+    
+    def kde_hf(self,hf_col,ax=None,include_ages=True,cmap='viridis',
+               marker_color='red',**kwargs):
+        if ax == None:
+            ax = plt.gca()
+        
+        hf = self.agedata[hf_col].dropna(how='any')
+        ages = self.bestage[hf.index]
+        
+        sns.kdeplot(x=ages,y=hf,ax=ax,fill=True,cmap=cmap,**kwargs)
+        
+        if include_ages==True:
+            self.plot_agehf(hf_col,ax=ax,color=marker_color,label=self.name)
+        
+        return(ax)
+    
+    def kde_img(self,log_scale=True,add_n=True,method='vermeesch',xlim=(10,4000),
                 **kwargs):
         """
         Save KDE as image file tied to dz object.
