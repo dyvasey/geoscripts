@@ -217,7 +217,11 @@ class DZSample:
         hf = self.agedata[hf_col].dropna(how='any')
         ages = self.bestage[hf.index]
         
-        sns.kdeplot(x=ages,y=hf,ax=ax,fill=True,cmap=cmap,**kwargs)
+        
+        sns.kdeplot(x=ages,y=hf,ax=ax,fill=True,cmap=cmap,
+                    **kwargs)
+        
+        ax.axhline(0,color='black')
         
         if include_ages==True:
             self.plot_agehf(hf_col,ax=ax,color=marker_color,label=self.name)
