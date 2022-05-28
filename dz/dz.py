@@ -563,6 +563,8 @@ def composite(samples,name,color=None):
         comp.latlon.append(sample.latlon)
         comp.bestage.name = 'Age (Ma)'
         comp.reported_age.append(sample.reported_age)
+
+    comp.bestage = comp.bestage.reset_index(drop=True)
     
     return(comp)
 
