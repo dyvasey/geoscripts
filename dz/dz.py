@@ -247,6 +247,9 @@ class DZSample:
 
             bw = [bw_ages,bw_hf]
         
+        elif isinstance(method,list):
+            bw=method
+        
         else:
             bw = 'normal reference'
 
@@ -277,15 +280,19 @@ class DZSample:
 
         #ax.contourf(xgrid,ygrid,z,cmap=cmap,**kwargs)
         cmap = cm.get_cmap(cmap).copy()
-        cmap.set_under(color='white')
+        cmap.set_under(color='white',alpha=0)
 
         ax.imshow(z_norm, cmap=cmap,extent=[xlim[0],xlim[1],ylim[0],ylim[1]],aspect='auto',origin='lower',**kwargs)
 
         ax.set_xlim(xlim)
         ax.set_ylim(ylim)
+        ax.axhline(0,color='black')
+        ax.set_xlabel('Age (Ma)')
+        ax.set_ylabel('$\epsilon Hf_i$')
 
         if include_ages==True:
-            self.plot_agehf(hf_col,ax=ax,color=marker_color,label=self.name)
+            self.plot_agehf(hf_col,ax=ax,facecolors=marker_color,edgecolors='black',label=self.name,s=4,
+            linewidths=0.5)
         
         return(ax)
     
