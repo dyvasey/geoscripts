@@ -287,6 +287,8 @@ class DZSample:
         ax.set_xlim(xlim)
         ax.set_ylim(ylim)
         ax.axhline(0,color='black')
+        ax.text(0.7,0.55,'CHUR',transform=ax.transAxes,fontsize=8)
+
         ax.set_xlabel('Age (Ma)')
         ax.set_ylabel('$\epsilon Hf_i$')
 
