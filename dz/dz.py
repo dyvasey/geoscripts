@@ -475,7 +475,7 @@ class DZSample:
                                    self.mda_err,self.mda_mswd,err_lev=err_lev,
                                    ax=ax,label=self.name)
         
-        return
+        return(self.mda,self.mda_err,self.mda_ages,self.mda_errors)
         
     def map_location(self,ax=None,crs=ccrs.PlateCarree(),**kwargs):
         """
