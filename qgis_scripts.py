@@ -43,3 +43,28 @@ def get_colors(filename='colors.csv'):
     output.to_csv(csv_path)
 
     return(names,colors)
+
+def get_layout_extent(name, map='Map 1', path='./extent.csv'):
+    # Get current project
+    project = QgsProject.instance()
+
+    # Get layout
+    layout = project.layoutManager().layoutByName(name)
+
+    # Get map
+    map = layout.itemById(map)
+    print(map.crs())
+
+    poly = map.visibleExtentPolygon()
+
+    points = [point for point in poly]
+
+    text = 'POLYGON(('
+    for point in points:
+        text = text + str(point.x()) + ' ' + str(point.y()) + ','
+
+    text = text +'))'
+
+    df = pd.DataFrame([text],columns=['wkt'])
+
+    df.to_csv(path)
