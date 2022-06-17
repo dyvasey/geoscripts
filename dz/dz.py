@@ -15,7 +15,7 @@ import statsmodels.api as sm
 from matplotlib.colors import cnames
 from matplotlib import cm
 
-from geoscripts.dz import botev,mda
+from geoscripts.dz import mda
 
 class DZSample:
     """ Object to hold detrital zircon sample metadata and ages. """
@@ -127,7 +127,7 @@ class DZSample:
         return(self.bestage)
     
     def kde(self,ax=None,log_scale=True,add_n=True,xaxis=True,rug=True,
-            method='vermeesch',ticks=[100,200,300,400,500,1000,2000,3000],
+            method=None,ticks=[100,200,300,400,500,1000,2000,3000],
             **kwargs):
         """
         Plot KDE via Seaborn using best age.
@@ -158,6 +158,7 @@ class DZSample:
         
         # Botev R script
         if method=='botev_r':
+            from geoscripts.dz import botev
             bandwidth = botev.botev_r(data_bw)
             bw_method = bandwidth/std
         
@@ -168,6 +169,7 @@ class DZSample:
             bw_method = bandwidth/std
             
         elif method=='vermeesch':
+            from geoscripts.dz import botev
             bandwidth = botev.vermeesch_r(data_bw)
             bw_method = bandwidth/std
             
@@ -180,9 +182,9 @@ class DZSample:
                     ax=ax,shade=True,color=self.color,gridsize=1000,
                     bw_method=bw_method,**kwargs)
         if rug == True:
-            sns.rugplot(self.bestage,ax=ax,height=-0.05,clip_on=False,
+            sns.rugplot(self.bestage,ax=ax,height=-0.03,clip_on=False,
                         color=self.color,expand_margins=False,
-                        linewidth=2)
+                        linewidth=1)
         
         ax.spines['top'].set_visible(False)
         ax.spines['right'].set_visible(False)
@@ -298,7 +300,7 @@ class DZSample:
         
         return(ax)
     
-    def kde_img(self,log_scale=True,add_n=True,method='vermeesch',xlim=(10,4000),
+    def kde_img(self,log_scale=True,add_n=True,method=None,xlim=(10,4000),
                 **kwargs):
         """
         Save KDE as image file tied to dz object.

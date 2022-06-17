@@ -72,3 +72,14 @@ def latlon2UTM(latitude,longitude,zone,south=False):
         longitude,latitude,src_crs=ccrs.Geodetic())
     
     return(easting,northing)
+
+def pseudom2latlon(easting,northing):
+    
+    # Set ouptput to lat/lon
+    crs = ccrs.Geodetic()
+    
+    # Convert
+    lon,lat = crs.transform_point(
+        easting,northing,src_crs=ccrs.epsg(3857))
+    
+    return(lat,lon)
