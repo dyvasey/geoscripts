@@ -427,7 +427,7 @@ class DZSample:
             ax.set_ylim(0,1)
         return
     
-    def calc_mda(self,method='ygc2sig',grains=None,plot=True):
+    def calc_mda(self,method='ygc2sig',grains=None,plot=True,overdisperse=False,systematic=True):
         """
         Calculate and plot maximum depositional age using selected grains
         """
@@ -470,6 +470,16 @@ class DZSample:
             squares_summed = np.sum(((self.mda_ages-self.mda)/errors_1sig)**2)
             
             self.mda_mswd = squares_summed/deg_free
+
+        if systematic==True:
+            print('Propagating systematic error - ',self.syst_238,'\nOriginal error: ',self.mda_err)
+            # Convert % error to absolute error
+            syst_err = self.syst_238/100 * self.mda
+            self.mda_err = np.sqrt(self.mda_err**2 + syst_err**2)
+
+        if overdisperse==True:
+            print('Using overdispersion factor, original error: ',self.mda_err)
+            self.mda_err = self.mda_err*np.sqrt(self.mda_mswd)
         
         if plot==True:
             fig,ax = plt.subplots(1,dpi=300)
@@ -479,6 +489,13 @@ class DZSample:
         
         return(self.mda,self.mda_err,self.mda_ages,self.mda_errors)
         
+    def plot_mda(self,ax=None):
+        mda.plot_weighted_mean(self.mda_ages,self.mda_errors,self.mda,
+                        self.mda_err,self.mda_mswd,err_lev=self.error_level,
+                        ax=ax,label=self.name)
+    
+        return(ax)
+    
     def map_location(self,ax=None,crs=ccrs.PlateCarree(),**kwargs):
         """
         Add sample location to map with Cartopy.
