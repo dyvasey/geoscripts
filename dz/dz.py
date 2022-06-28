@@ -46,7 +46,7 @@ class DZSample:
         
         return
 
-    def calc_discordance(self,col_238,col_207,cutoff=10,reverse_cutoff=-10,
+    def calc_discordance(self,col_238,col_207,cutoff=20,reverse_cutoff=-10,
                          age_cutoff=400):
         """
         Calculate discordance of 238U/206Pb and 207Pb/206Pb ages.
@@ -427,7 +427,7 @@ class DZSample:
             ax.set_ylim(0,1)
         return
     
-    def calc_mda(self,method='ygc2sig',grains=None,plot=True,overdisperse=False,systematic=True):
+    def calc_mda(self,method='ygc2sig',grains=None,plot=True,overdisperse=False,systematic=False):
         """
         Calculate and plot maximum depositional age using selected grains
         """
@@ -476,6 +476,9 @@ class DZSample:
             # Convert % error to absolute error
             syst_err = self.syst_238/100 * self.mda
             self.mda_err = np.sqrt(self.mda_err**2 + syst_err**2)
+        
+        else:
+            self.syst_238 = None
 
         if overdisperse==True:
             print('Using overdispersion factor, original error: ',self.mda_err)
@@ -485,14 +488,34 @@ class DZSample:
             fig,ax = plt.subplots(1,dpi=300)
             mda.plot_weighted_mean(self.mda_ages,self.mda_errors,self.mda,
                                    self.mda_err,self.mda_mswd,err_lev=err_lev,
-                                   ax=ax,label=self.name)
+                                   ax=ax,label=self.name,syst_error=systematic,
+                                   syst_238=self.syst_238)
         
         return(self.mda,self.mda_err,self.mda_ages,self.mda_errors)
         
-    def plot_mda(self,ax=None):
-        mda.plot_weighted_mean(self.mda_ages,self.mda_errors,self.mda,
-                        self.mda_err,self.mda_mswd,err_lev=self.error_level,
-                        ax=ax,label=self.name)
+    def convert_1sigto2sig(self):
+        if self.error_level=='2sig':
+            print('Errors already at 2sig')
+        elif self.error_level=='1sig':
+            print('Converting...')
+            self.besterror = self.besterror*2
+            self.error_level='2sig'
+            self.besterror.name = self.error_level
+        else:
+            print('Something went wrong')
+        return
+    
+    def plot_mda(self,ax=None,syst_error=False):
+        
+        if syst_error==False:
+            mda.plot_weighted_mean(self.mda_ages,self.mda_errors,self.mda,
+                            self.mda_err,self.mda_mswd,err_lev=self.error_level,
+                            ax=ax,label=self.name,syst_error=syst_error,syst_238=None)
+        
+        elif syst_error==True:
+            mda.plot_weighted_mean(self.mda_ages,self.mda_errors,self.mda,
+                self.mda_err,self.mda_mswd,err_lev=self.error_level,
+                ax=ax,label=self.name,syst_error=syst_error,syst_238=self.syst_238)
     
         return(ax)
     
