@@ -5,8 +5,9 @@ import string
 
 import matplotlib.pyplot as plt
 import pandas as pd
-import pyrolite.plot
 from mpltern.ternary.datasets import get_triangular_grid
+
+import pyrolite.plot
 
 def TAS(SiO2,Na2O,K2O,ax=None,first= [],**plt_kwargs):
     """
