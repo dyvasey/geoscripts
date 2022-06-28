@@ -63,6 +63,19 @@ def UTM2latlon(easting,northing,zone,south=False):
     return(lat,lon)
 
 def latlon2UTM(latitude,longitude,zone,south=False):
+    """
+    Calculate UTM coordinates from latitude and longitude.
+
+    Parameters:
+        latitude: Latitude (decimal degrees)
+        longitude: Longitude (decimal degrees)
+        zone: UTM zone as integer
+        south: Whether UTM zone is from the southern hemisphere
+    
+    Returns:
+        easting: UTM easting (m)
+        northing: UTM northing (m)
+    """
     
     # Set ouptput to UTM
     crs = ccrs.UTM(zone=zone,southern_hemisphere=south)
@@ -74,6 +87,17 @@ def latlon2UTM(latitude,longitude,zone,south=False):
     return(easting,northing)
 
 def pseudom2latlon(easting,northing):
+    """
+    Calculate latitude/longitude from pseudomercator.
+    
+    Parameters:
+        easting: pseudomercator easting (m)
+        northing: pseudomercator northing (m)
+    
+    Returns:
+        lat: Latitude (decimal degrees)
+        lon: Longitude (decimal degrees)
+    """
     
     # Set ouptput to lat/lon
     crs = ccrs.Geodetic()
