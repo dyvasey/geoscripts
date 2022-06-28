@@ -36,8 +36,21 @@ def viscosity(A,n,d,m,E,P,V,T,strain_rate=1e-15,R=8.31451):
 
 def visc_dislocation(A,n,E,P,V,T,strain_rate=1e-15,R=8.31451):
     """
-    Calculate viscosity for dislocation creep (m=0). See viscosity for 
-    parameters.
+    Calculate viscosity for dislocation creep (m=0). 
+
+    Parameters:
+        A: Power-law constant
+        n: Stress exponent
+        E: Activation energy (J/mol)
+        P: Pressure (Pa)
+        V: Activation volume (m^3/mol)
+        T: Temperature (K)
+        strain_rate: square root of the second invariant of 
+            the strain rate tensor (s^-1)
+        R: Gas constant (J/K*mol)
+        
+    Returns:
+        visc: Viscosity (Pa*s)
     """
     
     visc = viscosity(A=A,n=n,d=1,m=0,E=E,P=P,V=V,T=T,strain_rate=strain_rate,
@@ -72,8 +85,20 @@ def visc_disl_alt(C,n,t,E,I2=1e-15,R=8.31451):
 
 def visc_diffusion(A,d,m,E,P,V,T,strain_rate=1e-15,R=8.31451):
     """
-    Calculate viscosity for diffusion creep (n=1). See viscosity for
-    parameters
+    Parameters:
+        A: Power-law constant
+        d: Grain size (m)
+        m: Grain size exponent
+        E: Activation energy (J/mol)
+        P: Pressure (Pa)
+        V: Activation volume (m^3/mol)
+        T: Temperature (K)
+        strain_rate: square root of the second invariant of 
+            the strain rate tensor (s^-1)
+        R: Gas constant (J/K*mol)
+        
+    Returns:
+        visc: Viscosity (Pa*s)
     """
     
     visc = viscosity(A=A,n=1,d=d,m=m,E=E,P=P,V=V,T=T,strain_rate=strain_rate,
@@ -88,13 +113,16 @@ def visc_composite(visc_dislocation,visc_diffusion):
     Parameters:
         visc_dislocation: Viscosity (Pa*s) for dislocation creep
         visc_diffusion: Viscosity (Pa*s) for diffusion creep
+    
+    Returns:
+        visc: Viscosity (Pa*s)
     """
     
     visc = (visc_dislocation*visc_diffusion)/(visc_dislocation+visc_diffusion)
     
     return(visc)
 
-def cond_geotherm(thicknesses=[20,20,60],depth=400,
+def cond_geotherm(thicknesses=[20,20,60],depth=600,
              radiogenic_heat=[1.e-6,2.5e-7,0.],surface_t=273,
              heat_flow=0.05296,thermal_conductivity=2.5):
     """
@@ -168,7 +196,7 @@ def cond_geotherm(thicknesses=[20,20,60],depth=400,
     return(temps,heat_flows,z,tc)
 
 def adiab_geotherm(z,ast=1573,gravity=9.81,thermal_expansivity=2.e-5,
-                   heat_capacity=750,depth=400):
+                   heat_capacity=750,depth=600):
     """
     Calculate adiabatic geotherm. Assumes numpy array of depths (z) has
     already been calculated using conc_geotherm()
@@ -286,11 +314,25 @@ def pressure(z,rho,g=9.81):
     
     return(p)
 
-def density_profile(z,thicknesses=[20,20,60],densities=[2700,2850,3300,3300],
-                    depth=400):
+def density_profile(z,thicknesses=[20,20,60],densities=[2800,2900,3300,3300],
+                    depth=600):
     """
-    Create numpy array of density for given depth array (z). Currently
-    requires upper crust, lower crust, mantle lithosphere, and asthenosphere
+    Create numpy array of density for given depth array (z). 
+    
+    Currently requires upper crust, lower crust, mantle lithosphere, 
+    and asthenosphere.
+        
+    Parameters:
+        z: Array of depths (m)
+        thicknesses: Thicknesses (km) of upper crust, lower crust, 
+            and mantle lithosphere
+        densities: Densities (kg/m^2) for upper crust, lower crust,
+            mantle lithosphere, and asthenosphere
+        depth: Total depth (km) of profile.
+    
+    Returns:
+        rho: Array of densities (kg/m^2)
+
     """
     rho = np.zeros(len(z))
     
@@ -316,6 +358,37 @@ def viscosity_profile(A,A_df,n,d,m,E,E_df,V,V_df,thicknesses=[20,20,60],
                     depth=600,strain_rate=1e-15,R=8.31451,plot=True):
     """
     Calculate composite viscosity profile using factors as reported to ASPECT.
+
+    Parameters:
+        A: Power-law constant (dislocation creep)
+        A_df: Power-law constant (diffusion creep)
+        n: Stress exponent
+        d: Grain size (m)
+        m: Grain size exponent
+        E: Activation energy (J/mol) (dislocation creep)
+        E_df: Activation energy (J/mol) (diffusion creep)
+        V: Activation volume (m^3/mol) (dislocation creep)
+        V_df: Activation volume (m^3/mol) (diffusion creep)
+        thicknesses: Thicknesses (km) of upper crust, lower crust, 
+            and mantle lithosphere
+        densities: Densities (kg/m^2) for upper crust, lower crust,
+            mantle lithosphere, and asthenosphere
+        heat_flow: Surface heat flow (W/m^3)
+        thermal_expansivity: Thermal expansivity (K^-1)
+        depth: Total depth (km) of profile.
+        strain_rate: square root of the second invariant of 
+            the strain rate tensor (s^-1)
+        R: Gas constant (J/K*mol)
+        plot: Boolean for whether to plot profile
+
+    Returns:
+        z: Array of depths (m)
+        comp: Array of viscosity (Pa*s) for composite creep
+        disl: Array of viscosity (Pa*s) for dislocation creep
+        diff: Array of viscosity (Pa*s) for diffusion creep
+        tt: Temperature (K) of combined conductive and adiabatic geotherm at
+            each depth.
+        p: pressure (Pa or kg/m*s^2) at each depth
     """
     # Calculate geotherm
     temps,heat_flows,z,tt,tc,ta = geotherm(thicknesses=thicknesses,depth=depth,
@@ -395,6 +468,7 @@ def viscosity_profile(A,A_df,n,d,m,E,E_df,V,V_df,thicknesses=[20,20,60],
 def byerlee(density,depth):
     """
     Calculate failure criterion from density and depth using Byerlee's Law.
+
     Parameters
     ----------
     density: Density of material (kg/m^3)
@@ -414,6 +488,19 @@ def byerlee(density,depth):
     return(tau)
 
 def adiab_density(input_density,thermal_expansivity,temperature,reference_temp):
+    """
+    Calculate adiabatic density for a given input density.
+
+    Parameters:
+        input_density: Input density (kg/m^2)
+        thermal_expansivity: Thermal expansivity (K^-1)
+        temperature: Temperature (K)
+        reference_temp: Reference temperature (K)
+    
+    Returns:
+        output: Adiabatic density (kg/m^2)
+
+    """
     
     output = input_density * (
         1 - thermal_expansivity * (temperature - reference_temp))
@@ -421,6 +508,18 @@ def adiab_density(input_density,thermal_expansivity,temperature,reference_temp):
     return(output)
 
 def drucker_prager(pressure,internal_friction=30,cohesion=20):
+    """
+    Calculate failure strength using Drucker-Prager criterion.
+
+    Parameters:
+        pressure: Pressure (Pa)
+        internal_friction: Angle of internal friction (degrees)
+        cohesion: Cohesion (MPa)
+    
+    Returns:
+        strength: Strength (Pa)
+
+    """
     friction_rad = np.radians(internal_friction)
     cohesion_pa = cohesion*1e6
     strength = pressure*np.sin(friction_rad) + cohesion_pa*np.cos(friction_rad)
