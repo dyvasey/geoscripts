@@ -1,5 +1,5 @@
 """
-A setuptools based setup module.
+Setuptools module for installation
 """
 
 # Always prefer setuptools over distutils
