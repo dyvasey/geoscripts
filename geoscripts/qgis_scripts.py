@@ -47,6 +47,15 @@ def get_colors(filename='colors.csv'):
 def get_layout_extent(name, map='Map 1', path='./extent.csv'):
     """
     Save layout map extent as wkt polygon in .csv file
+
+    Parameters:
+        name: Name of QGIS layout
+        map: Name of map within QGIS layout
+        path: Path to output CSV file
+    
+    Returns:
+        None
+
     """
     # Get current project
     project = QgsProject.instance()
@@ -71,3 +80,5 @@ def get_layout_extent(name, map='Map 1', path='./extent.csv'):
     df = pd.DataFrame([text],columns=['wkt'])
 
     df.to_csv(path)
+
+    return
