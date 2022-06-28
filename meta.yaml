@@ -1,0 +1,25 @@
+package:
+  name: geoscripts
+  version: 0.0.2
+
+source:
+  git_url: "https://github.com/dyvasey/geoscripts"
+  git_rev: "develo-package"
+
+requirements:
+  build:
+    - python
+    - setuptools
+
+  host:
+    - python
+    - geos
+    - proj
+  
+  run:
+    - python
+    - geos
+    - proj
+
+about:
+  home: "https://github.com/dyvasey/geoscripts"
