@@ -9,6 +9,7 @@ import numpy as np
 import cartopy.crs as ccrs
 import matplotlib.pyplot as plt
 import pandas as pd
+
 import geopandas as gpd
 import statsmodels.api as sm
 
@@ -47,7 +48,7 @@ class DZSample:
         return
 
     def calc_discordance(self,col_238,col_207,cutoff=20,reverse_cutoff=-10,
-                         age_cutoff=400):
+                         age_cutoff=600):
         """
         Calculate discordance of 238U/206Pb and 207Pb/206Pb ages.
         
@@ -78,7 +79,7 @@ class DZSample:
 
     def calc_bestage(self,col_238,col_207,err_238=None,err_207=None,
                      age_cutoff=900,filter_disc=True,use_err=False,err_lev='2sig',
-                     disc_cutoff=10,reverse_cutoff=-10,disc_age_cutoff=400):
+                     disc_cutoff=20,reverse_cutoff=-10,disc_age_cutoff=600):
         """
         Determine best age from 238U/206Pb and 207Pb/206Pb ages.
         
@@ -204,6 +205,16 @@ class DZSample:
         return(ax)
     
     def plot_agehf(self,hf_col,ax=None,**kwargs):
+        """
+        Plot zircon age against Hf isotopic value
+
+        Parameters:
+            hf_col: Column in agedata with Hf values
+            ax: Axes on which to plot values
+        
+        Returns:
+            ax: Axes with plot
+        """
         if ax == None:
             ax = plt.gca()
         
@@ -215,7 +226,24 @@ class DZSample:
     
     def kde_hf(self,hf_col,ax=None,include_ages=True,cmap='viridis',method=None,
                marker_color='red',xlim='auto',ylim='auto',**kwargs):
-        
+        """
+        Plot bivariate KDE of age vs. Hf
+
+        Parameters:
+            hf_col: Column in agedata with Hf values
+            ax: Axes on which to draw plot
+            include_ages: Boolean for whether to include scatter plot of individual ages
+            cmap: Colormap for KDE
+            method: Method for bandwidth calculation. Options include 'vermeesch','botev_r', 
+                a list of bandwidths for the x and y axes, or the 'normal reference' 
+                bandwidth in statsmodels. Current recommended use is a list of
+                bandwidths.
+            marker_color: Color for scatter plot of ages if used.
+            xlim: Limits of x axis. Default is automatic determination of minimum and
+                maximum values, or can be provided as a tuple.
+            ylim: Limits of y axis. Default is automatic determination of minimum and
+                maximum values, or can be provided as a tuple.
+        """
         if ax is None:
             ax=plt.gca()
 
@@ -228,23 +256,21 @@ class DZSample:
             ylim = (np.min(hf),np.max(hf))
 
         if method=='vermeesch':
+            import botev
             bw_ages = botev.vermeesch_r(ages)
-            # bw_method_ages = bw_ages/ages.std()
             print(bw_ages)
 
             bw_hf = botev.vermeesch_r(hf)
-            # bw_method_hf = bw_hf/hf.std()
             print(bw_hf)
 
             bw = [bw_ages,bw_hf]
 
         elif method=='botev_r':
+            import botev
             bw_ages = botev.botev_r(ages)
-            # bw_method_ages = bw_ages/ages.std()
             print(bw_ages)
 
             bw_hf = botev.botev_r(hf)
-            # bw_method_hf = bw_hf/hf.std()
             print(bw_hf)
 
             bw = [bw_ages,bw_hf]
@@ -344,7 +370,16 @@ class DZSample:
     
     def cad(self,ax=None,depage=None,**kwargs):
         """
-        Plot cumulative age distribution
+        Plot cumulative age distribution (CAD).
+
+        Parameters:
+            ax: Axes on which to plot CAD
+            depage: Age to use as depositional age. If specified,
+                subtracts each age by this value, or by the 
+                youngest age if 'youngest.'
+
+        Returns:
+            ax: Axes with plot
         """
         if ax == None:
             ax = plt.gca()
@@ -368,6 +403,13 @@ class DZSample:
     def cawood_classify(self,depage='youngest',plot=False):
         """
         Classify sample using Cawood et al., 2012 framework.
+
+        Parameters:
+            depage: Age to use as depositional age. If specified,
+                subtracts each age by this value, or by the 
+                youngest age if 'youngest.'
+            plot: Boolean for whether to plot CAD colored
+                by Cawood classification.
         """
         
         if depage == 'youngest':
@@ -429,7 +471,22 @@ class DZSample:
     
     def calc_mda(self,method='ygc2sig',grains=None,plot=True,overdisperse=False,systematic=False):
         """
-        Calculate and plot maximum depositional age using selected grains
+        Calculate and plot maximum depositional age (MDA).
+
+        Requires that bestage has already been determined.
+
+        Parameters:
+            method: Method to use for MDA. Current options are 'ygc2sig','ygc1sig', and 'manual.'
+            grains: Indicies of grains to use if using 'manual' method.
+            plot: Boolean of whether to output MDA plot.
+            overdisperse: Whether to factor in overdispersion in final error for MDA.
+            systematic: Whether to factor in systematic error in final error for MDA.
+        
+        Returns:
+            self.mda: Maximumd depositional age (Ma)
+            self.mda_err: Error on MDA (Ma)
+            self.mda_ages: Ages used in MDA calculation (Ma)
+            self.mda_errors: Errors for ages used in MDA calculation (Ma)
         """
         age_errors = pd.concat([self.bestage,self.besterror],axis=1)
         ages_sorted = age_errors.sort_values(by=['Best Age'],ignore_index=True)
@@ -494,6 +551,16 @@ class DZSample:
         return(self.mda,self.mda_err,self.mda_ages,self.mda_errors)
         
     def convert_1sigto2sig(self):
+        """
+        Convert 1 sigma errors on best ages to 2 sigma.
+
+        Parameters:
+            None
+        
+        Returns:
+            None
+        """
+
         if self.error_level=='2sig':
             print('Errors already at 2sig')
         elif self.error_level=='1sig':
@@ -506,7 +573,17 @@ class DZSample:
         return
     
     def plot_mda(self,ax=None,syst_error=False):
+        """
+        Plot sample MDA as weighted mean plot.
+
+        Parameters:
+            ax: Axes on which to plot.
+            syst_error: Boolean for whether to include systematic error
         
+        Returns:
+            ax: Axes with plot.
+        """
+
         if syst_error==False:
             mda.plot_weighted_mean(self.mda_ages,self.mda_errors,self.mda,
                             self.mda_err,self.mda_mswd,err_lev=self.error_level,
@@ -571,6 +648,9 @@ class DZSample:
         
         Parameters:
             filename: name of file (optional)
+
+        Returns:
+            None
         """
         path = 'dz/'
         os.makedirs(path,exist_ok=True)
