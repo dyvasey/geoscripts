@@ -4,18 +4,22 @@ Module of mapping functions for use with Cartopy
 import string
 import json
 
+import numpy as np
+import pandas as pd
+
+import matplotlib
+import matplotlib.pyplot as plt
+import matplotlib.ticker as mticker
+
 import cartopy.crs as ccrs
 import cartopy.feature as cf
 import cartopy.geodesic as cgeo
 from cartopy.io.shapereader import Reader
 from cartopy.feature import ShapelyFeature
-import matplotlib
-import matplotlib.pyplot as plt
-import matplotlib.ticker as mticker
-import numpy as np
+
 from shapely import geometry
 from shapely.geometry.polygon import Polygon
-import pandas as pd
+
 
 def bath(res='10m',ax=None):
     """
