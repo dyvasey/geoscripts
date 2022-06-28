@@ -10,6 +10,16 @@ from itertools import combinations
 def weighted_mean(ages,errors,err_lev='2sig'):
     """
     Calculate weighted mean given ages and errors
+
+    Parameters:
+        ages: Ages (Ma)
+        errors: Errors on ages (Ma)
+        err_lev: Error level ('1sig' or '2sig')
+    
+    Returns:
+        wmean: Weighted mean age (Ma)
+        werror: Error on weighted mean (Ma)
+        mswd: MSWD for weighted mean
     """
     weights = 1/errors**2
     
@@ -35,7 +45,28 @@ def weighted_mean(ages,errors,err_lev='2sig'):
 
 def plot_weighted_mean(ages,errors,mean,mean_error,mswd,err_lev='2sig',ax=None, 
                        label='Sample',syst_238=None,syst_error=False,**kwargs):
+    """
+    Make weighted mean plot in Isoplot style:
+
+    Parameters:
+        ages: Ages used for weighted mean (Ma)
+        errors: Errors on ages (Ma)
+        mean: Weighted mean age (Ma)
+        mean_error: Error on weighted mean (Ma)
+        mswd: MSWD for weighted mean age
+        err_lev: Error level for ages ('1sig' or '2sig')
+        ax: Axes on which to make plot
+        label: Name of sample
+        syst_238: Systematic error for weighted mean age (%)
+            Currently assumes 238 age is appropriate (not correct
+            for older ages)
+        syst_error: Boolean for whethter to propagate systematic error
     
+    Returns:
+        ax: Axes with plot
+    """
+
+
     if ax is None:
         ax = plt.gca()
     
@@ -68,9 +99,22 @@ def plot_weighted_mean(ages,errors,mean,mean_error,mswd,err_lev='2sig',ax=None,
     
 def ygc2sig(ages,err_lev='2sig'):
     """
-    Youngest 3+ grains at 2 sigma overlap.
+    Get weighted mean for youngest 3+ grains at 2 sigma overlap.
     
-    Ages must be sorted and include errors as a Pandas dataframe
+    Ages must be sorted and include errors as a single Pandas DataFrame.
+
+    Parameters:
+        ages: Pandas Data Frame with sorted ages and errors (Ma)
+        err_lev: Error level ('1sig' or '2sig')
+
+    Returns:
+        wmean: Weighted mean age (Ma)
+        werror: Weighted mean error (Ma)
+        mswd: MSWD for weighted mean
+        ages_only: Ages used for weighted mean age (Ma)
+        errors_only: Errors for ages_only (Ma)
+        success: Boolean for whether 3 grains overlapping at 2 sigma
+            found
     """
     all_overlap = False
     force = False
@@ -169,7 +213,20 @@ def ygc1sig(ages,err_lev='2sig'):
     """
     Youngest 2+ grains at 1 sigma overlap.
     
-    Ages must be sorted and include errors as a Pandas dataframe
+    Ages must be sorted and include errors as a single Pandas DataFrame.
+
+    Parameters:
+        ages: Pandas Data Frame with sorted ages and errors (Ma)
+        err_lev: Error level ('1sig' or '2sig')
+
+    Returns:
+        wmean: Weighted mean age (Ma)
+        werror: Weighted mean error (Ma)
+        mswd: MSWD for weighted mean
+        ages_only: Ages used for weighted mean age (Ma)
+        errors_only: Errors for ages_only (Ma)
+        success: Boolean for whether 2 grains overlapping at 1 sigma
+            found
     """
     all_overlap = False
     force = False
