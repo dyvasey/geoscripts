@@ -3,22 +3,46 @@ package:
   version: 0.0.2
 
 source:
-  git_url: "https://github.com/dyvasey/geoscripts"
-  git_rev: "develop-package"
+  path: .
+
+build:
+  script: "{{ PYTHON }} -m pip install . -vv"
 
 requirements:
+
+  build:
+    - {{ compiler('c') }}
+    - {{ compiler('cxx') }}
 
   host:
     - python
     - setuptools
-    - numpy
+    - pip
     - geos
     - proj
+    - numpy>=1.10
+    - cython
   
   run:
     - python
     - geos
     - proj
+    - numpy>=1.10
+    - pandas
+    - matplotlib
+    - seaborn
+    - scipy
+    - shapely
+    - cartopy
+    - statsmodels
+    - geopandas
+    - mpltern
+    - pyrolite
+
+test:
+  imports:
+    - geoscripts
+    - geoscripts.dz
 
 about:
   home: "https://github.com/dyvasey/geoscripts"
