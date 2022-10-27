@@ -1,7 +1,17 @@
 name: geoscripts
 channels:
-  - davasey
   - conda-forge
   - defaults
 dependencies:
-  - geoscripts
+    - python=3.10
+    - numpy>=1.10
+    - pandas
+    - matplotlib
+    - seaborn
+    - scipy
+    - shapely
+    - cartopy
+    - statsmodels
+    - geopandas
+    - mpltern
+    - pyrolite
