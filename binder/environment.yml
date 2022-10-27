@@ -1,0 +1,7 @@
+name: geoscripts
+channels:
+  - davasey
+  - conda-forge
+  - defaults
+dependencies:
+  - geoscripts
