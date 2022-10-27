@@ -15,9 +15,20 @@ dz_dir = os.path.dirname(os.path.realpath(__file__))
 
 def py_kde(data,kde_min=None,kde_max=None):
     """
-    Pythonic implementation of Botev et al., 2010 algorithim. Very hard to
-    get to work with SciPy solvers, so currently deprecated in preference
-    of R-based solutions in other functions.
+    Pythonic implementation of Botev et al., 2010 algorithim. 
+    
+    Very hard to get to work with SciPy solvers, so currently deprecated 
+    in preference of R-based solutions in other functions.
+
+    Parameters:
+        data: Array or series of ages
+        kde_min: Minimum value for the KDE
+        kde_max: Maximum value for the KDE
+    
+    Returns:
+        xgrid: Grid for the KDE
+        density: Densities at each point on the grid
+        bandwidth: Bandwidth for each point on the grid
     """
     
     #fsolve will fail if using another n.
@@ -61,7 +72,6 @@ def py_kde(data,kde_min=None,kde_max=None):
     a = discrete_cosine_transform(counts_percent)
     
     # Compute bandwidth
-    
     I = np.arange(1,n)**2
     a2 = (a[1:n+1]/2)**2
     
@@ -87,7 +97,13 @@ def py_kde(data,kde_min=None,kde_max=None):
     
 def discrete_cosine_transform(data):
     """
-    DCT in support of py_kde function
+    Discrete cosine transform in support of py_kde function.
+
+    Parameters:
+        data: Data to be transformed
+    
+    Returns:
+        data_transformed: Transformed data
     """
     data_length = len(data)
     weight_initial = np.array([1])
@@ -109,7 +125,13 @@ def discrete_cosine_transform(data):
 
 def inverse_dct(data):
     """
-    DCT in support of py_kde function
+    Inverse DCT in support of py_kde function
+
+        Parameters:
+        data: Data to be transformed
+    
+    Returns:
+        data_transformed: Transformed data
     """
     data_length = len(data)
     entries = np.arange(0,data_length)
@@ -130,7 +152,7 @@ def inverse_dct(data):
 
 def fixed_point(t,N,I,a2):
     """
-    Fixed Point function in support of py_kde
+    Fixed Point function in support of py_kde.
     
     From Betov code:
     this implements the function t-zeta*gamma^[l](t)
@@ -147,31 +169,6 @@ def fixed_point(t,N,I,a2):
     
     out = t - (2*N*np.sqrt(np.pi)*f)**(-2/5)
     return(abs(out))
-
-
-def pilot_density(data,bandwidth):
-    """
-    Pilot density function in support of adaptive_kde after IsoplotR.
-    """
-    data_length = len(data)
-    
-    density = np.zeros(data_length)
-    for k,x in enumerate(data):
-        density = density + stats.norm.pdf(data,loc=x,scale=bandwidth)
-    
-    return(density)
-
-def adaptive_kde(data,bandwidth):
-    """
-    Determine adaptive KDE bandwidth factor after IsoplotR and Abramson, 1982.
-    """
-    density = pilot_density(data,bandwidth)
-    density_mean = stats.gmean(density)
-    
-    
-    factor = np.sqrt(density_mean/density)
-    
-    return(factor)
 
 def botev_r(data):
     """

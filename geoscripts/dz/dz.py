@@ -347,19 +347,6 @@ class DZSample:
         self.kde(ax=ax,log_scale=log_scale,add_n=add_n,method=method,
                  **kwargs)
         
-        #sns.kdeplot(self.bestage,log_scale=log_scale,label=self.name,
-        #            ax=ax,shade=True,color=self.color,bw_adjust=bw_adjust,
-        #            **kwargs).set(title=self.name)
-        
-        #ax.spines['top'].set_visible(False)
-        #ax.spines['right'].set_visible(False)
-        #ax.spines['left'].set_visible(False)
-        #ax.get_yaxis().set_visible(False)
-        
-        #if add_n == True:
-        #    text = 'n = ' + str(self.bestage.count())
-        #    ax.text(0.02,0.5,text,transform=ax.transAxes,fontweight='bold')
-        
         path = 'dz/'
         os.makedirs(path,exist_ok=True)
         name = self.name+'_KDE.png'
