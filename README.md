@@ -1,6 +1,6 @@
 # Geoscripts
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![DOI](https://zenodo.org/badge/334745753.svg)](https://zenodo.org/badge/latestdoi/334745753)[![Anaconda-Server Badge](https://anaconda.org/davasey/geoscripts/badges/version.svg)](https://anaconda.org/davasey/geoscripts)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/dyvasey/geoscripts/HEAD) [![Anaconda-Server Badge](https://anaconda.org/davasey/geoscripts/badges/version.svg)](https://anaconda.org/davasey/geoscripts) [![DOI](https://zenodo.org/badge/334745753.svg)](https://zenodo.org/badge/latestdoi/334745753)
 
 ## About
 
