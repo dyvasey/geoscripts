@@ -668,7 +668,7 @@ def composite(samples,name,color=None):
     comp.reported_age = []
     
     for sample in samples:
-        comp.bestage = comp.bestage.append(sample.bestage)
+        comp.bestage = pd.concat([comp.bestage,sample.bestage])
         comp.latlon.append(sample.latlon)
         comp.bestage.name = 'Age (Ma)'
         comp.reported_age.append(sample.reported_age)
