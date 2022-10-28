@@ -184,8 +184,8 @@ def ygc2sig(ages,err_lev='2sig'):
                 if ngrains>3:
                     ngrains = ngrains-1
                     
-                    ages_only = ages_only[:-1]
-                    errors_only = errors_only[:-1]
+                    ages_only = ages_only.iloc[:-1]
+                    errors_only = errors_only.iloc[:-1]
                     
                     wmean,werror,mswd = weighted_mean(
                         ages_only,errors_only,err_lev)
