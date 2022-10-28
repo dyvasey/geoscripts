@@ -180,7 +180,7 @@ class DZSample:
             
             
         sns.kdeplot(self.bestage,log_scale=log_scale,label=self.name,
-                    ax=ax,shade=True,color=self.color,gridsize=1000,
+                    ax=ax,fill=True,color=self.color,gridsize=1000,
                     bw_method=bw_method,**kwargs)
         if rug == True:
             sns.rugplot(self.bestage,ax=ax,height=-0.03,clip_on=False,
