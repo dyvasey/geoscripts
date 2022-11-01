@@ -663,7 +663,7 @@ def composite(samples,name,color=None):
     
     """
     comp = DZSample(name,color=color)
-    comp.bestage = pd.Series()
+    comp.bestage = pd.Series(dtype='float64')
     comp.latlon = []
     comp.reported_age = []
     
