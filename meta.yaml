@@ -29,7 +29,7 @@ requirements:
     - geos
     - proj
     - numpy>=1.10
-    - pandas
+    - pandas=1.5.1
     - matplotlib
     - seaborn
     - scipy
