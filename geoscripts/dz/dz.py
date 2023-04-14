@@ -629,7 +629,7 @@ class DZSample:
         
         return
     
-    def save(self,filename=None):
+    def save(self,filename=None,path='dz/'):
         """
         Save DZ object to .dz file to reload in other scripts.
         
@@ -639,7 +639,6 @@ class DZSample:
         Returns:
             None
         """
-        path = 'dz/'
         os.makedirs(path,exist_ok=True)
         
         if filename==None:
