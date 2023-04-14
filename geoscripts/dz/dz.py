@@ -14,6 +14,7 @@ import geopandas as gpd
 import statsmodels.api as sm
 
 from matplotlib.colors import cnames
+from matplotlib.patches import Ellipse
 from matplotlib import cm
 
 from geoscripts.dz import mda
@@ -582,7 +583,70 @@ class DZSample:
                 ax=ax,label=self.name,syst_error=syst_error,syst_238=self.syst_238)
     
         return(ax)
-    
+
+    def plot_concordia(self,col_238,err_238,col_207,err_207,ax=None,grains='all',
+                       err_lev='2sig',mda=False):
+
+        if ax is None:
+            ax=plt.gca()
+        
+        # Plot concordia line
+        ages_phan = np.arange(10,500,10)
+        ages_prec = np.arange(500,4000,500)
+        ages_all = np.hstack([ages_phan,ages_prec])
+        
+        ratios = age2ratios(ages_all)
+
+        ax.plot(ratios[0],ratios[1],color='red')
+        ax.scatter(ratios[0],ratios[1],color='red')
+
+        for k,v in enumerate(ages_all):
+            ax.annotate(v,(ratios[0][k],ratios[1][k]))
+
+        # Plot data
+
+        if grains=='all':
+            grains = len(self.agedata[col_238])
+        
+        if mda:
+            grains = len(self.mda_ages)
+
+        org_data = pd.concat([self.agedata[col_238],self.agedata[err_238],
+                               self.agedata[col_207],self.agedata[err_207]],axis=1)
+
+        org_data.columns = ['U238Pb206','err238206','Pb207Pb206','err207206']
+
+        data_sorted = org_data.sort_values(by=['U238Pb206'],ascending=False,
+                                           ignore_index=True)
+
+        self.U238Pb206 = data_sorted['U238Pb206'][0:grains]
+        self.Pb207Pb206 = data_sorted['Pb207Pb206'][0:grains]
+
+        xlims = (np.min(self.U238Pb206)-2,np.max(self.U238Pb206)+2)
+        ylims = (np.min(self.Pb207Pb206)-0.001,np.max(self.Pb207Pb206)+0.001)
+
+        ax.set_xlim(xlims)
+        ax.set_ylim(ylims)
+
+        if err_lev=='2sig':
+            self.err238206 = data_sorted['U238Pb206'][0:grains]
+            self.err207206 = data_sorted['err238206'][0:grains]
+
+        elif err_lev=='1sig':
+            self.err238206 = data_sorted['Pb207Pb206'][0:grains]*2
+            self.err207206 = data_sorted['err207206'][0:grains]*2
+
+        for k,v in enumerate(self.U238Pb206):
+            e = Ellipse((self.U238Pb206[k],self.Pb207Pb206[k]),
+                        width=self.err238206[k]*2,
+                        height=self.err207206[k]*2,
+                        linewidth=1,edgecolor='black',
+                        alpha=0.5)
+        
+            ax.add_patch(e)
+
+        return(ax)
+
     def map_location(self,ax=None,crs=ccrs.PlateCarree(),**kwargs):
         """
         Add sample location to map with Cartopy.
@@ -745,6 +809,15 @@ def load_all(path='dz/'):
             samples.append(obj)
     
     return(samples)
+
+def age2ratios(age,lambda238=1.55125e-10,lambda235=9.8485e-10):
+    age_yr = age*1e6
+    ratio238206 = 1/(np.exp(lambda238*age_yr)-1)
+    ratio207206 = (
+        (1/137.818)*(np.exp(lambda235*age_yr)-1)/(np.exp(lambda238*age_yr)-1)
+    )
+
+    return(ratio238206,ratio207206)
             
 
             

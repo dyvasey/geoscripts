@@ -124,7 +124,7 @@ setup(
     #
     # For an analysis of "install_requires" vs pip's requirements files see:
     # https://packaging.python.org/discussions/install-requires-vs-requirements/
-    install_requires=["pandas","matplotlib","seaborn","scipy",
+    install_requires=["pandas==1.5.1","matplotlib","seaborn","scipy",
     "shapely","cartopy","statsmodels","geopandas","mpltern","pyrolite","numpy>=1.10"],  # Optional
     # List additional groups of dependencies here (e.g. development
     # dependencies). Users will be able to install these using the "extras"
