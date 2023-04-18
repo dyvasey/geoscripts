@@ -205,6 +205,26 @@ class DZSample:
         
         return(ax)
     
+    def pie(self,bins,ax=None,**kwargs):
+        """
+        Plot pie chart showing relative percentages of zircon ages.
+
+        Requires that bestage is assigned
+        """
+
+        if ax == None:
+            ax = plt.gca()
+
+        hist = np.histogram(self.bestage,bins=bins)
+
+        labels = [str(bins[x])+ '-' + str(bins[x+1]) + ' Ma' for x in range(len(bins)-1)]
+
+        ax.pie(hist[0],labels=labels,**kwargs)
+
+        return(ax)
+
+        
+
     def plot_agehf(self,hf_col,ax=None,**kwargs):
         """
         Plot zircon age against Hf isotopic value
