@@ -605,61 +605,79 @@ class DZSample:
         return(ax)
 
     def plot_concordia(self,col_238,err_238,col_207,err_207,ax=None,grains='all',
-                       err_lev='2sig',mda=False):
+                       err_lev='2sig',mda=False,inverted_ratios=False,percent_error=True):
 
         if ax is None:
             ax=plt.gca()
         
         # Plot concordia line
-        ages_phan = np.arange(10,500,10)
-        ages_prec = np.arange(500,4000,500)
-        ages_all = np.hstack([ages_phan,ages_prec])
+        ages_phan1 = np.arange(0,300,50)[1:]
+        ages_phan2 = np.arange(300,1500,200)
+        ages_prec = np.arange(1500,4000,500)
+        ages_all = np.hstack([ages_phan1,ages_phan2,ages_prec])
+
+        ages_curve = np.arange(0,4000,10)[1:]
         
         ratios = age2ratios(ages_all)
+        ratios_curve = age2ratios(ages_curve)
 
-        ax.plot(ratios[0],ratios[1],color='red')
+        ax.plot(ratios_curve[0],ratios_curve[1],color='red')
         ax.scatter(ratios[0],ratios[1],color='red')
 
         for k,v in enumerate(ages_all):
             ax.annotate(v,(ratios[0][k],ratios[1][k]))
 
         # Plot data
-
-        if grains=='all':
-            grains = len(self.agedata[col_238])
-        
         if mda:
-            grains = len(self.mda_ages)
+            grain_min = np.min(self.mda_ages.index)
+            grain_max = np.max(self.mda_ages.index)
+
+        elif grains=='all':
+            grain_min = 0
+            grain_max = len(self.agedata[col_238])
+
+        else:
+            grain_min = np.min(grains)
+            grain_max = np.max(grains)
 
         org_data = pd.concat([self.agedata[col_238],self.agedata[err_238],
                                self.agedata[col_207],self.agedata[err_207]],axis=1)
 
         org_data.columns = ['U238Pb206','err238206','Pb207Pb206','err207206']
 
+        if inverted_ratios:
+            org_data['U238Pb206'] = 1/org_data['U238Pb206']
+            org_data['Pb207Pb206'] = 1/org_data['Pb207Pb206']
+        
+        # Convert percentage errors to absolute
+        if percent_error:
+            org_data['err238206'] = (org_data['err238206']/100)*org_data['U238Pb206'] 
+            org_data['err207206'] = (org_data['err207206']/100)*org_data['Pb207Pb206'] 
+
         data_sorted = org_data.sort_values(by=['U238Pb206'],ascending=False,
                                            ignore_index=True)
 
-        self.U238Pb206 = data_sorted['U238Pb206'][0:grains]
-        self.Pb207Pb206 = data_sorted['Pb207Pb206'][0:grains]
-
-        xlims = (np.min(self.U238Pb206)-2,np.max(self.U238Pb206)+2)
-        ylims = (np.min(self.Pb207Pb206)-0.001,np.max(self.Pb207Pb206)+0.001)
-
-        ax.set_xlim(xlims)
-        ax.set_ylim(ylims)
+        self.U238Pb206 = data_sorted.loc[grain_min:grain_max,'U238Pb206']
+        self.Pb207Pb206 = data_sorted.loc[grain_min:grain_max,'Pb207Pb206']
 
         if err_lev=='2sig':
-            self.err238206 = data_sorted['U238Pb206'][0:grains]
-            self.err207206 = data_sorted['err238206'][0:grains]
+            self.err238206 = data_sorted.loc[grain_min:grain_max,'err238206']
+            self.err207206 = data_sorted.loc[grain_min:grain_max,'err207206']
 
         elif err_lev=='1sig':
-            self.err238206 = data_sorted['Pb207Pb206'][0:grains]*2
-            self.err207206 = data_sorted['err207206'][0:grains]*2
+            self.err238206 = data_sorted.loc[grain_min:grain_max,'err238206']*2
+            self.err207206 = data_sorted.loc.loc[grain_min:grain_max,'err207206']*2
+
+        xlims = (np.min(self.U238Pb206-self.err238206)-2,np.max(self.U238Pb206+self.err238206)+2)
+        ylims = (np.min(self.Pb207Pb206-self.err207206)-0.01,np.max(self.Pb207Pb206+self.err207206)+0.01)
+
+        ax.set_xlim(0,xlims[1])
+        ax.set_ylim(0.045,ylims[1])
 
         for k,v in enumerate(self.U238Pb206):
-            e = Ellipse((self.U238Pb206[k],self.Pb207Pb206[k]),
-                        width=self.err238206[k]*2,
-                        height=self.err207206[k]*2,
+            e = Ellipse((self.U238Pb206.iloc[k],self.Pb207Pb206.iloc[k]),
+                        width=self.err238206.iloc[k]*2,
+                        height=self.err207206.iloc[k]*2,
                         linewidth=1,edgecolor='black',
                         alpha=0.5)
         
