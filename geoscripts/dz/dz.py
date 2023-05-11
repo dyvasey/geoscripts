@@ -477,7 +477,8 @@ class DZSample:
             ax.set_ylim(0,1)
         return
     
-    def calc_mda(self,method='ygc2sig',grains=None,plot=True,overdisperse=False,systematic=False):
+    def calc_mda(self,method='ygc2sig',grains=None,plot=True,overdisperse=False,systematic=False,
+                 filter235238=False,cutoffs235238=(80,110)):
         """
         Calculate and plot maximum depositional age (MDA).
 
@@ -491,12 +492,19 @@ class DZSample:
             systematic: Whether to factor in systematic error in final error for MDA.
         
         Returns:
-            self.mda: Maximumd depositional age (Ma)
+            self.mda: Maximum depositional age (Ma)
             self.mda_err: Error on MDA (Ma)
             self.mda_ages: Ages used in MDA calculation (Ma)
             self.mda_errors: Errors for ages used in MDA calculation (Ma)
         """
         age_errors = pd.concat([self.bestage,self.besterror],axis=1)
+
+        if filter235238:
+            concordance = np.round((self.age_238/self.age_235)*100,0)
+            accept = ((concordance >= cutoffs235238[0]) & (concordance <= cutoffs235238[1]))
+            age_errors = age_errors[accept]
+            print(np.min(concordance),np.max(concordance))
+        
         ages_sorted = age_errors.sort_values(by=['Best Age'],ignore_index=True)
         err_lev = self.error_level
         
@@ -557,7 +565,29 @@ class DZSample:
                                    syst_238=self.syst_238)
         
         return(self.mda,self.mda_err,self.mda_ages,self.mda_errors)
-        
+
+    def calc_ysg(self,systematic=True,filter235238=False,cutoffs235238=(80,110)):
+
+        # Sort by best age
+        age_errors = pd.concat([self.bestage,self.besterror],axis=1).dropna(how='any')
+
+        # Filter for concordance
+        if filter235238:
+            concordance = np.round((self.age_238/self.age_235)*100,0)
+            accept = ((concordance >= cutoffs235238[0]) & (concordance <= cutoffs235238[1]))
+            age_errors = age_errors[accept]
+
+        ages_sorted = age_errors.sort_values(by=['Best Age'],ignore_index=True)
+
+        # Find youngest age
+        self.ysg = ages_sorted.iloc[0,0]
+
+        # Propagate systematic error
+        ysg_syst = (self.syst_238/100)*self.ysg 
+        self.ysg_err = np.sqrt(ages_sorted.iloc[0,1]**2 + ysg_syst**2)
+
+        return(self.ysg,self.ysg_err)
+
     def convert_1sigto2sig(self):
         """
         Convert 1 sigma errors on best ages to 2 sigma.
@@ -606,6 +636,10 @@ class DZSample:
 
     def plot_concordia(self,col_238,err_238,col_207,err_207,ax=None,grains='all',
                        err_lev='2sig',mda=False,inverted_ratios=False,percent_error=True):
+
+        """
+        Errors handled incorrectly. Function currently not useable.
+        """
 
         if ax is None:
             ax=plt.gca()
