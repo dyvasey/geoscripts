@@ -39,6 +39,8 @@ Geoscripts currently has a long list of specific dependencies; a goal for future
 
 Vasey, D.A., Cowgill, E., and Cooper, K.M., 2021, A Preliminary Framework for Magmatism in Modern Continental Back-Arc Basins and Its Application to the Triassic-Jurassic Tectonic Evolution of the Caucasus: _Geochemistry, Geophysics, Geosystems_, v. 22, p. e2020GC009490, doi:https://doi.org/10.1029/2020GC009490.
 
+Vasey, D.A., Garcia, L., Cowgill, E., Trexler, C.C. and Godoladze, T., in revision, Episodic evolution of a protracted convergent margin revealed by detrital zircon geochronology in the Greater Caucasus: _Basin Research_.
+
 
 
 
