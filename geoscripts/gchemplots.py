@@ -173,16 +173,40 @@ def TASsm(SiO2,Na2O,K2O,ax=None,first= [],**plt_kwargs):
         first.append('Not First')      
     return(ax)
 
-def afm(Na2O,K2O,FeOt,MgO,ax=None,first=[],**plt_kwargs):
+def afm(Na2O,K2O,FeOt,MgO,ax=None,first=[],fontsize=8,
+        scatter=True,density=False,scatter_kwargs={},
+        density_kwargs={}):
     """
     Plot AFM diagram after Irvine and Baragar (1971)
     """
     if first==[]:
         A,F,M = afm_line()
         ax.plot(F,A,M,linestyle='--',color='black')
+
+        # Add tholeiite and calc-alkaline
+        ax.text(0.7,0.15,0.15,'Tholeiitic',ha='center', va='center')
+        ax.text(0.25,0.375,0.375,'Calc-Alkaline',ha='center', va='center')
+
+        first.append('NotFirst')
     
-    ax.scatter(FeOt,Na2O+K2O,MgO,**plt_kwargs)
-    first.append('Not First')
+    if density:
+        df = pd.DataFrame(data=[FeOt,Na2O+K2O,MgO]).T
+        df.pyroplot.density(ax=ax,**density_kwargs)
+    
+    if scatter:
+        ax.scatter(FeOt,Na2O+K2O,MgO,**scatter_kwargs)
+    
+    # Set labels
+    ax.set_tlabel('F',fontsize=fontsize)
+    ax.set_llabel('A',fontsize=fontsize)
+    ax.set_rlabel('M',fontsize=fontsize)
+
+    # Remove ticks
+    ax.taxis.set_ticks([])
+    ax.laxis.set_ticks([])
+    ax.raxis.set_ticks([])
+
+
 
     return(ax)
 
