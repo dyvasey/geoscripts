@@ -85,6 +85,15 @@ def test_mantle_array():
     # Test that the scatter plot worked
     assert ax.collections
 
+    # Test whether the annotations plotted
+    plot_text = [child.get_text() for child in ax.get_children() if isinstance(child,matplotlib.text.Text)]
+    assert plot_text[0] == 'Mantle Array'
+    assert plot_text[1] == 'Arc Array'
+
+    # Test that the lables plotted
+    assert ax.get_xlabel()=='Nb/Yb'
+    assert ax.get_ylabel()=='Th/Yb'
+
     # Test that the boundary line will not replot on a second call
     gcp.mantle_array(Th,Nb,Yb,ax=ax)
     assert len(ax.get_lines())==1

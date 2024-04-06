@@ -340,6 +340,9 @@ def mantle_array(Th,Nb,Yb,ax=None,first=[],scatter=True,density=False,
         ax.add_patch(pgon)
         ax.plot(xvals,yvals,color='gray')
 
+        ax.text(0.6,0.03,'Mantle Array',ha='center', va='center',fontsize=8,rotation=45)
+        ax.text(0.3,0.2,'Arc Array',ha='center', va='center',fontsize=8,rotation=45)
+
         first.append('NotFirst')
 
     if density:
