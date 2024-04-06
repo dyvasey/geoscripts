@@ -57,3 +57,16 @@ def classifyTAS(df):
                 df.loc[i,'Lithology']='Trachyandesite' 
     
     return(df)
+
+def classifyAlkaline(df):
+    """
+    Classify rocks as subalkaline or alkaline with Irvine and Barangar, 1971
+    """
+    A = df.loc[:,'Na2O'] + df.loc[:,'K2O']
+    S = (
+        -3.3539e-4*A**6 + 1.2030e-2*A**5 - 1.5188e-1*A**4
+        + 8.6096e-1*A**3 - 2.1111*A**2 + 3.9492*A + 39.0
+    )
+    subalkaline = df.loc[:,'SiO2']>=S
+
+    return(subalkaline)

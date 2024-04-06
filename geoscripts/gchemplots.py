@@ -3,6 +3,7 @@ Module for making geochemical plots.
 """
 import string
 
+import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 from mpltern.ternary.datasets import get_triangular_grid
@@ -171,6 +172,53 @@ def TASsm(SiO2,Na2O,K2O,ax=None,first= [],**plt_kwargs):
         # Avoid repeat grid plotting
         first.append('Not First')      
     return(ax)
+
+def afm(Na2O,K2O,FeOt,MgO,ax=None,first=[],fontsize=8,
+        scatter=True,density=False,scatter_kwargs={},
+        density_kwargs={}):
+    """
+    Plot AFM diagram after Irvine and Baragar (1971)
+    """
+    if first==[]:
+        A,F,M = afm_line()
+        ax.plot(F,A,M,linestyle='--',color='black')
+
+        # Add tholeiite and calc-alkaline
+        ax.text(0.7,0.15,0.15,'Tholeiitic',ha='center', va='center',fontsize=8)
+        ax.text(0.25,0.375,0.375,'Calc-Alkaline',ha='center', va='center',fontsize=8)
+
+        first.append('NotFirst')
+    
+    if density:
+        df = pd.DataFrame(data=[FeOt,Na2O+K2O,MgO]).T
+        df.pyroplot.density(ax=ax,**density_kwargs)
+    
+    if scatter:
+        ax.scatter(FeOt,Na2O+K2O,MgO,**scatter_kwargs)
+    
+    # Set labels
+    ax.set_tlabel('F',fontsize=fontsize)
+    ax.set_llabel('A',fontsize=fontsize)
+    ax.set_rlabel('M',fontsize=fontsize)
+
+    # Remove ticks
+    ax.taxis.set_ticks([])
+    ax.laxis.set_ticks([])
+    ax.raxis.set_ticks([])
+
+
+
+    return(ax)
+
+def afm_line():
+    M = np.arange(5,45,2)
+    F = (
+        1.5559e-12 * M**8 - 7.7142e-10 * M**7 + 1.5664e-7 * M**6
+          - 1.6738e-5 * M**5 + 1.0017e-3 * M**4 - 3.2552e-2 * M**3
+            + 4.7776e-1 * M**2 - 1.1085 * M + 30.0
+    )
+    A = 100 - M - F
+    return(A,F,M)
 
 def cabanis(Tb,Th,Ta,ax=None,grid=False,first=[],**plt_kwargs):
     """
