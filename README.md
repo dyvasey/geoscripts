@@ -8,7 +8,7 @@ Geoscripts is a Python package designed to support geologic data analysis and fi
 
 ## Installation
 
-Geoscripts is still in very early stages of package development. It can currently be installed via conda from my [Anaconda channel](https://anaconda.org/davasey/geoscripts) using the following commands within a conda environment:
+Geoscripts is still in very early stages of package development. The most recent release (v0.2.0) can currently be installed via conda from my [Anaconda channel](https://anaconda.org/davasey/geoscripts) using the following commands within a conda environment:
 
 `conda install -c davasey geoscripts`
 
@@ -37,9 +37,9 @@ Geoscripts currently has a long list of specific dependencies; a goal for future
 
 ## Publications Using Geoscripts
 
-Vasey, D.A., Cowgill, E., and Cooper, K.M., 2021, A Preliminary Framework for Magmatism in Modern Continental Back-Arc Basins and Its Application to the Triassic-Jurassic Tectonic Evolution of the Caucasus: _Geochemistry, Geophysics, Geosystems_, v. 22, p. e2020GC009490, doi:https://doi.org/10.1029/2020GC009490.
+Vasey, D.A., Cowgill, E., and Cooper, K.M., 2021, A Preliminary Framework for Magmatism in Modern Continental Back-Arc Basins and Its Application to the Triassic-Jurassic Tectonic Evolution of the Caucasus: _Geochemistry, Geophysics, Geosystems_, v. 22, e2020GC009490, doi:10.1029/2020GC009490.
 
-Vasey, D.A., Garcia, L., Cowgill, E., Trexler, C.C. and Godoladze, T., in revision, Episodic evolution of a protracted convergent margin revealed by detrital zircon geochronology in the Greater Caucasus: _Basin Research_.
+Vasey, D.A., Garcia, L., Cowgill, E., Trexler, C.C. and Godoladze, T., 2024, Episodic evolution of a protracted convergent margin revealed by detrital zircon geochronology in the Greater Caucasus: _Basin Research_, v. 36, no. 1, e12825, doi:10.1111/bre.12825
 
 
 
