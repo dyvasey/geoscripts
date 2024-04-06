@@ -6,9 +6,12 @@ import string
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-from mpltern.ternary.datasets import get_triangular_grid
 
 import pyrolite.plot
+
+from mpltern.ternary.datasets import get_triangular_grid
+from matplotlib.patches import Polygon
+
 
 def TAS(SiO2,Na2O,K2O,ax=None,first= [],**plt_kwargs):
     """
@@ -310,6 +313,49 @@ def cabanisd(Tb,Th,Ta,ax=None,grid=False,**plt_kwargs):
     ax.taxis.set_ticks([])
     ax.laxis.set_ticks([])
     ax.raxis.set_ticks([])
+
+    return(ax)
+
+def mantle_array(Th,Nb,Yb,ax=None,first=[],scatter=True,density=False,
+                 scatter_kwargs={},density_kwargs={}):
+    """
+    Mantle array plot after Pearce, 2008
+    """
+    if ax is None:
+        ax = plt.gca()
+
+    if first==[]:
+    # MORB-OIB Array
+        x = [0.1,0.3,1000,1000,800,0.1]
+        y = [0.01,0.01,48,100,100,0.01]
+        xy_array = np.column_stack((x,y))
+
+        # Arc Array
+        b = (np.log10(10)-np.log10(1.2))/(np.log10(0.8)-np.log10(0.1))
+        a = np.log10(10)-np.log10(0.8)
+        xvals = np.arange(0,1000)
+        yvals = a*np.power(xvals,b)
+
+        pgon = Polygon(xy_array,alpha=0.2,zorder=0,color='gray')
+        ax.add_patch(pgon)
+        ax.plot(xvals,yvals,color='gray')
+
+        first.append('NotFirst')
+
+    if density:
+        df = pd.DataFrame(data=[Nb/Yb,Th/Yb]).T
+        df.pyroplot.density(ax=ax,logx=True,logy=True,**density_kwargs)
+        
+    if scatter:
+        ax.scatter(Nb/Yb,Th/Yb,**scatter_kwargs)
+
+    ax.set_xscale('log')
+    ax.set_yscale('log')
+
+    ax.set_xlim(0.1,100)
+    ax.set_ylim(0.01,10)
+    ax.set_xlabel('Nb/Yb')
+    ax.set_ylabel('Th/Yb')
 
     return(ax)
 
