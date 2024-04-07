@@ -187,8 +187,8 @@ def afm(Na2O,K2O,FeOt,MgO,ax=None,first=[],fontsize=8,
         ax.plot(F,A,M,linestyle='--',color='black')
 
         # Add tholeiite and calc-alkaline
-        ax.text(0.7,0.15,0.15,'Tholeiitic',ha='center', va='center',fontsize=8)
-        ax.text(0.25,0.375,0.375,'Calc-Alkaline',ha='center', va='center',fontsize=8)
+        ax.text(0.7,0.15,0.15,'Tholeiitic',ha='center', va='center',fontsize=6)
+        ax.text(0.25,0.375,0.375,'Calc-Alkaline',ha='center', va='center',fontsize=6)
 
         first.append('NotFirst')
     
