@@ -11,6 +11,7 @@ import pyrolite.plot
 
 from mpltern.ternary.datasets import get_triangular_grid
 from matplotlib.patches import Polygon
+from matplotlib.collections import PathCollection
 
 
 def TAS(SiO2,Na2O,K2O,ax=None,first= [],**plt_kwargs):
@@ -316,7 +317,7 @@ def cabanisd(Tb,Th,Ta,ax=None,grid=False,**plt_kwargs):
 
     return(ax)
 
-def mantle_array(Th,Nb,Yb,ax=None,first=[],scatter=True,density=False,
+def mantle_array(Th,Nb,Yb,ax=None,scatter=True,density=False,
                  scatter_kwargs={},density_kwargs={}):
     """
     Mantle array plot after Pearce, 2008
@@ -324,7 +325,10 @@ def mantle_array(Th,Nb,Yb,ax=None,first=[],scatter=True,density=False,
     if ax is None:
         ax = plt.gca()
 
-    if first==[]:
+    # Check for existing scatter plots
+    scatters = sum(isinstance(coll, PathCollection) for coll in ax.collections)
+
+    if scatters==0:
     # MORB-OIB Array
         x = [0.1,0.3,1000,1000,800,0.1]
         y = [0.01,0.01,48,100,100,0.01]
@@ -343,7 +347,7 @@ def mantle_array(Th,Nb,Yb,ax=None,first=[],scatter=True,density=False,
         ax.text(3,0.07,'Mantle Array',ha='center', va='center',fontsize=6,rotation=45)
         ax.text(0.3,0.2,'Arc Array',ha='center', va='center',fontsize=6,rotation=45)
 
-        first.append('NotFirst')
+        #first.append('NotFirst')
 
     if density:
         df = pd.DataFrame(data=[Nb/Yb,Th/Yb]).T
