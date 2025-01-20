@@ -205,25 +205,41 @@ class DZSample:
         
         return(ax)
     
-    def pie(self,bins,ax=None,**kwargs):
+    def pie(self,spans,ax=None,autopct=pie_autopct,wedgeprops={'alpha':0.5},
+    **kwargs):
         """
         Plot pie chart showing relative percentages of zircon ages.
 
-        Requires that bestage is assigned
-        """
+        Requires that bestage is assigned. Ages not included in spans will
+        be shown as white space.
 
+         Parameters:
+            spans: List of tuples of ages to use for pie chart
+            ax: Axes on which to plot KDE
+        """
+        # Assign axes to current axes if not specified
         if ax == None:
             ax = plt.gca()
 
-        hist = np.histogram(self.bestage,bins=bins)
+        # Create empty list of sizes
+        sizes = []
 
-        labels = [str(bins[x])+ '-' + str(bins[x+1]) + ' Ma' for x in range(len(bins)-1)]
+        # Loop through spans and count ages in each span
+        for span in spans:
+            condition = (self.bestage>=span[0])&(self.bestage<span[1])
+            count = self.bestage[condition].count()
+            sizes.append(count)
+        
+        # Get number of ages not included in spans
+        not_counted = len(self.bestage) - sum(sizes)
 
-        ax.pie(hist[0],labels=labels,**kwargs)
+        # Add to total size of pie chart
+        total = sizes + [not_counted]
+
+        # Plot
+        ax.pie(total,autopct=autopct,wedgeprops=wedgeprops,**kwargs)
 
         return(ax)
-
-        
 
     def plot_agehf(self,hf_col,ax=None,**kwargs):
         """
@@ -890,6 +906,10 @@ def age2ratios(age,lambda238=1.55125e-10,lambda235=9.8485e-10):
     )
 
     return(ratio238206,ratio207206)
+
+def pie_autopct(pct):
+    """ Function for pie chart labeling """
+    return ('%1.0f%%' % pct) if pct > 1 else '' 
             
 
             
