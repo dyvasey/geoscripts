@@ -19,6 +19,10 @@ from matplotlib import cm
 
 from geoscripts.dz import mda
 
+def pie_autopct(pct):
+    """ Function for pie chart labeling """
+    return ('%1.0f%%' % pct) if pct > 1 else '' 
+
 class DZSample:
     """ Object to hold detrital zircon sample metadata and ages. """
     
@@ -907,9 +911,7 @@ def age2ratios(age,lambda238=1.55125e-10,lambda235=9.8485e-10):
 
     return(ratio238206,ratio207206)
 
-def pie_autopct(pct):
-    """ Function for pie chart labeling """
-    return ('%1.0f%%' % pct) if pct > 1 else '' 
+
             
 
             
