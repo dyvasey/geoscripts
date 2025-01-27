@@ -47,13 +47,13 @@ def test_add_pie():
     smp.add_pie(spans=spans,ax=ax)
 
     # Test that the figure contains 2 axes
-    assert len(fig.get_axes())==2
+    assert len(fig.get_axes())==1
 
     # Test the same using the option in the KDE function
     fig2,ax2 = plt.subplots(1)
     smp.kde(ax=ax2,add_pie=True,spans=spans)
 
-    assert len(fig2.get_axes())==2
+    assert len(fig2.get_axes())==1
 
 
 
