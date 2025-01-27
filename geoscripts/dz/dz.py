@@ -135,7 +135,7 @@ class DZSample:
     def kde(self,ax=None,log_scale=True,add_n=True,xaxis=True,rug=True,
             method=None,ticks=[100,200,300,400,500,1000,2000,3000],
             spans=None,span_colors=None,span_kwargs={},add_pie=False,
-            pie_kwargs={},**kwargs):
+            pie_colors=None,pie_kwargs={},**kwargs):
         """
         Plot KDE via Seaborn using best age.
         
@@ -212,7 +212,9 @@ class DZSample:
             self.add_spans(spans=spans,ax=ax,colors=span_colors,**span_kwargs)
         
         if add_pie:
-            self.add_pie(spans=spans,ax=ax,colors=span_colors,**pie_kwargs)
+            if span_colors is not None:
+                pie_colors = span_colors[0:len(spans)] + 'white'
+            self.add_pie(spans=spans,ax=ax,colors=pie_colors,**pie_kwargs)
         
         return(ax)
     
