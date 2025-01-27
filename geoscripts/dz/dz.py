@@ -248,10 +248,10 @@ class DZSample:
 
         return(ax)
     
-    def add_pie(self,spans,ax,autopct=pie_autopct,wedgeprops={'alpha':0.5},
-    **kwargs):
+    def add_pie(self,spans,ax,autopct=None,bounds=[0.8,0.5,0.2,0.2],
+                wedgeprops={'alpha':0.5},**kwargs):
         """Function to add pie chart to bottom right of existing KDE"""
-        ax_pie = ax.inset_axes(bounds=[0.8,0.1,0.1,0.1])
+        ax_pie = ax.inset_axes(bounds=bounds)
         self.pie(spans,ax=ax_pie,autopct=autopct,wedgeprops=wedgeprops,**kwargs)
         return(ax_pie)
 
