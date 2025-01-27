@@ -213,7 +213,7 @@ class DZSample:
         
         if add_pie:
             if span_colors is not None:
-                pie_colors = span_colors[0:len(spans)] + 'white'
+                pie_colors = span_colors[0:len(spans)] + ['white']
             self.add_pie(spans=spans,ax=ax,colors=pie_colors,**pie_kwargs)
         
         return(ax)
