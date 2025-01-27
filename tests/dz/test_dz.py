@@ -31,6 +31,32 @@ def test_pie():
     # Test that the figure contains 1 axes
     assert len(fig.get_axes())==1
 
+def test_add_pie():
+    """Test Add Pie function"""
+
+    # Create figure
+    fig,ax = plt.subplots(1)
+
+    # Set spans
+    spans = [(0,75),(100,301)]
+
+    # Plot KDE
+    smp.kde(ax=ax)
+
+    # Add pie chart
+    smp.add_pie(spans=spans,ax=ax)
+
+    # Test that the figure contains 2 axes
+    assert len(fig.get_axes())==2
+
+    # Test the same using the option in the KDE function
+    fig2,ax2 = plt.subplots(1)
+    smp.kde(ax=ax2,add_pie=True,spans=spans)
+
+    assert len(fig2.get_axes())==2
+
+
+
     
 
 
