@@ -134,7 +134,8 @@ class DZSample:
     
     def kde(self,ax=None,log_scale=True,add_n=True,xaxis=True,rug=True,
             method=None,ticks=[100,200,300,400,500,1000,2000,3000],
-            spans=None,span_kwargs={},add_pie=False,pie_kwargs={},**kwargs):
+            spans=None,span_colors=None,span_kwargs={},add_pie=False,
+            pie_kwargs={},**kwargs):
         """
         Plot KDE via Seaborn using best age.
         
@@ -208,10 +209,10 @@ class DZSample:
             ax.get_xaxis().set_visible(False)
         
         if spans is not None:
-            self.add_spans(spans=spans,ax=ax,**span_kwargs)
+            self.add_spans(spans=spans,ax=ax,colors=span_colors,**span_kwargs)
         
         if add_pie:
-            self.add_pie(spans=spans,ax=ax,**pie_kwargs)
+            self.add_pie(spans=spans,ax=ax,colors=span_colors,**pie_kwargs)
         
         return(ax)
     
@@ -258,7 +259,7 @@ class DZSample:
         self.pie(spans,ax=ax_pie,autopct=autopct,wedgeprops=wedgeprops,**kwargs)
         return(ax_pie)
     
-    def add_spans(self,spans,ax,colors=None,**kwargs):
+    def add_spans(self,spans,ax,colors=None,alpha=0.5,**kwargs):
         """ 
         Function to add spans to existing KDE 
         
@@ -269,7 +270,7 @@ class DZSample:
             colors = prop_cycle.by_key()['color']
 
         for k,span in enumerate(spans):
-            ax.axvspan(*span,alpha=0.3,lw=0,color=colors[k],**kwargs)
+            ax.axvspan(*span,alpha=alpha,lw=0,color=colors[k],**kwargs)
         return(ax)
 
     def plot_agehf(self,hf_col,ax=None,**kwargs):
