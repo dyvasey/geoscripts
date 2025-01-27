@@ -10,7 +10,7 @@ import pytest
 from geoscripts.dz import dz
 
 # Create synthetic data
-ages = pd.Series([50,150,145,250,252,255,300,355])
+ages = pd.Series([50,150,145,250,252,255,300,355,1542,2555,3000])
 
 # Create basic dz sample
 smp = dz.DZSample(name='test',agedata=ages)
@@ -38,7 +38,7 @@ def test_add_pie():
     fig,ax = plt.subplots(1)
 
     # Set spans
-    spans = [(0,75),(100,301)]
+    spans = [(0,75),(100,301),(500,700)]
 
     # Plot KDE
     smp.kde(ax=ax)
