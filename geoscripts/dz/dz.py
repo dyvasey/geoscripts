@@ -259,7 +259,11 @@ class DZSample:
         return(ax_pie)
     
     def add_spans(self,spans,ax,**kwargs):
-        """ Function to add spans to existing KDE """
+        """ 
+        Function to add spans to existing KDE 
+        
+        TODO: Set up so spans are different colors
+        """
         for span in spans:
             ax.axvspan(*span,alpha=0.3,lw=0,**kwargs)
         return(ax)
