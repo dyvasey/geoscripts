@@ -49,9 +49,11 @@ def test_add_pie():
     # Test that the figure contains 2 axes
     assert len(fig.get_axes())==1
 
-    # Test the same using the option in the KDE function
+    # Test the same using the option in the KDE function with colors
     fig2,ax2 = plt.subplots(1)
-    smp.kde(ax=ax2,add_pie=True,spans=spans)
+    cmap = plt.get_cmap('magma')
+    colors = cmap.colors
+    smp.kde(ax=ax2,add_pie=True,spans=spans,span_colors=colors)
 
     assert len(fig2.get_axes())==1
 
@@ -72,9 +74,11 @@ def test_add_spans():
     
     assert len(fig.get_axes())==1
 
-    # Test the same using the option in the KDE function
+    # Test the same using the option in the KDE function with colors
     fig2,ax2 = plt.subplots(1)
-    smp.kde(ax=ax2,spans=spans)
+    cmap = plt.get_cmap('magma')
+    colors = cmap.colors
+    smp.kde(ax=ax2,spans=spans,span_colors=colors)
 
     assert len(fig2.get_axes())==1
 
