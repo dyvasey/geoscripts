@@ -13,7 +13,7 @@ import pandas as pd
 import geopandas as gpd
 import statsmodels.api as sm
 
-from matplotlib.colors import cnames,to_rgba
+from matplotlib.colors import cnames,to_rgb
 from matplotlib.patches import Ellipse
 from matplotlib import cm
 
@@ -213,7 +213,7 @@ class DZSample:
         
         if add_pie:
             if span_colors is not None:
-                pie_colors = span_colors[0:len(spans)] + [to_rgba('white')]
+                pie_colors = span_colors[0:len(spans)] + [to_rgb('white')]
             self.add_pie(spans=spans,ax=ax,colors=pie_colors,**pie_kwargs)
         
         return(ax)
