@@ -134,7 +134,7 @@ class DZSample:
     
     def kde(self,ax=None,log_scale=True,add_n=True,xaxis=True,rug=True,
             method=None,ticks=[100,200,300,400,500,1000,2000,3000],
-            spans=None,add_pie=False,pie_kwargs={},**kwargs):
+            spans=None,span_kwargs={},add_pie=False,pie_kwargs={},**kwargs):
         """
         Plot KDE via Seaborn using best age.
         
@@ -207,6 +207,9 @@ class DZSample:
         if xaxis == False:
             ax.get_xaxis().set_visible(False)
         
+        if spans is not None:
+            self.add_spans(spans=spans,ax=ax,**span_kwargs)
+        
         if add_pie:
             self.add_pie(spans=spans,ax=ax,**pie_kwargs)
         
@@ -248,12 +251,18 @@ class DZSample:
 
         return(ax)
     
-    def add_pie(self,spans,ax,autopct=None,bounds=[0.8,0.5,0.2,0.2],
+    def add_pie(self,spans,ax,autopct=None,bounds=[0.7,0.5,0.5,0.5],
                 wedgeprops={'alpha':0.5},**kwargs):
         """Function to add pie chart to bottom right of existing KDE"""
         ax_pie = ax.inset_axes(bounds=bounds)
         self.pie(spans,ax=ax_pie,autopct=autopct,wedgeprops=wedgeprops,**kwargs)
         return(ax_pie)
+    
+    def add_spans(self,spans,ax,**kwargs):
+        """ Function to add spans to existing KDE """
+        for span in spans:
+            ax.axvspan(*span,alpha=0.3,lw=0,**kwargs)
+        return(ax)
 
     def plot_agehf(self,hf_col,ax=None,**kwargs):
         """

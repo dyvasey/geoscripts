@@ -55,6 +55,29 @@ def test_add_pie():
 
     assert len(fig2.get_axes())==1
 
+def test_add_spans():
+    """Test Add Spans function"""
+
+    # Create figure
+    fig,ax = plt.subplots(1)
+
+    # Set spans
+    spans = [(0,75),(100,301)]
+
+    # Plot KDE
+    smp.kde(ax=ax)
+
+    # Test adding spans
+    smp.add_spans(spans=spans,ax=ax)
+    
+    assert len(fig.get_axes())==1
+
+    # Test the same using the option in the KDE function
+    fig2,ax2 = plt.subplots(1)
+    smp.kde(ax=ax2,spans=spans)
+
+    assert len(fig2.get_axes())==1
+
 
 
     
