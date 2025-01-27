@@ -258,14 +258,18 @@ class DZSample:
         self.pie(spans,ax=ax_pie,autopct=autopct,wedgeprops=wedgeprops,**kwargs)
         return(ax_pie)
     
-    def add_spans(self,spans,ax,**kwargs):
+    def add_spans(self,spans,ax,colors=None,**kwargs):
         """ 
         Function to add spans to existing KDE 
         
         TODO: Set up so spans are different colors
         """
-        for span in spans:
-            ax.axvspan(*span,alpha=0.3,lw=0,**kwargs)
+        if colors is None:
+            prop_cycle = plt.rcParams['axes.prop_cycle']
+            colors = prop_cycle.by_key()['color']
+
+        for k,span in enumerate(spans):
+            ax.axvspan(*span,alpha=0.3,lw=0,color=colors[k],**kwargs)
         return(ax)
 
     def plot_agehf(self,hf_col,ax=None,**kwargs):
