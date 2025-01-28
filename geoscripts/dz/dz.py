@@ -212,14 +212,12 @@ class DZSample:
             self.add_spans(spans=spans,ax=ax,colors=span_colors,**span_kwargs)
         
         if add_pie:
-            if span_colors is not None:
-                pie_colors = list(span_colors[0:len(spans)]) + ['white']
             self.add_pie(spans=spans,ax=ax,colors=pie_colors,**pie_kwargs)
         
         return(ax)
     
     def pie(self,spans,ax=None,autopct=pie_autopct,wedgeprops={'alpha':0.5},
-    **kwargs):
+    colors=None,**kwargs):
         """
         Plot pie chart showing relative percentages of zircon ages.
 
@@ -233,6 +231,15 @@ class DZSample:
         # Assign axes to current axes if not specified
         if ax == None:
             ax = plt.gca()
+
+        # Assign colors if not specified
+        if colors is None:
+            prop_cycle = plt.rcParams['axes.prop_cycle']
+            colors = prop_cycle.by_key()['color']
+        
+        # Enforce white as last color
+        colors_filled = colors[0:len(spans)]
+        pie_colors = list(colors_filled) + ['white'] 
 
         # Create empty list of sizes
         sizes = []
@@ -250,7 +257,7 @@ class DZSample:
         total = sizes + [not_counted]
 
         # Plot
-        ax.pie(total,autopct=autopct,wedgeprops=wedgeprops,**kwargs)
+        ax.pie(total,autopct=autopct,wedgeprops=wedgeprops,colors=pie_colors,**kwargs)
 
         return(ax)
     
