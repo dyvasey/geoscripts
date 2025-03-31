@@ -39,7 +39,7 @@ def TAS(SiO2,Na2O,K2O,ax=None,first= [],**plt_kwargs):
     alkalis = Na2O + K2O
     
     # Plot data
-    ax.scatter(SiO2,alkalis, **plt_kwargs)
+    ax.scatter(SiO2,alkalis, **plt_kwargs,zorder=2)
     
     # Check if first empty to avoid repeat plotting of TAS grid/labels
     if first == []:
@@ -68,8 +68,8 @@ def TAS(SiO2,Na2O,K2O,ax=None,first= [],**plt_kwargs):
         labelsy = [1.55,2.8,3,3,3,8,11,8.5,7,5.65,7,9.3,11.5,14,12]
         labeltext = ['Picrobasalt','Basalt','Basaltic\nAndesite','Andesite',
                      'Dacite','Rhyolite','Trachyte/Trachydacite',
-                     'Trachy-andesite','Basaltic-\ntrachy-andesite',
-                     'Trachy-basalt','Tephrite/\nBasanite','Phono-tephrite',
+                     'Trachy\n-andesite','Basaltic-\ntrachy-\nandesite',
+                     'Trachy-\nbasalt','Tephrite/\nBasanite','Phono-tephrite',
                      'Tephri-phonolite','Phonolite','Foidite']
   
         # Create subalkaline/alkaline fields
@@ -78,20 +78,25 @@ def TAS(SiO2,Na2O,K2O,ax=None,first= [],**plt_kwargs):
         
         
         # Plot Subalkaline/Alkaline line
-        ax.plot(subalkx,subalky,'r--')
-        ax.text(38,2,'Alkaline',rotation=45,color='r',ha='center',va='center')
+        ax.plot(subalkx,subalky,'r--',zorder=1)
+        ax.text(38,2,'Alkaline',rotation=45,color='r',ha='center',va='center',fontsize=8,zorder=1)
         ax.text(49,2,'Subalkaline',rotation=45,color='r',ha='center',
-                va='center')
+                va='center',fontsize=8,zorder=1)
         
         #Set axes limits
         ax.set_xlim(35,80)
         ax.set_ylim(0,16)
        
         for z in range(15): # Loop through and plot TAS lines
-            ax.plot(lines[z][0],lines[z][1],'k')
+            ax.plot(lines[z][0],lines[z][1],'k',zorder=0)
             ax.text(labelsx[z],labelsy[z],labeltext[z],color='k',
-                    ha='center',va='center',fontsize=10)
+                    ha='center',va='center',fontsize=6,zorder=0)
         
+        # Set labels
+        ax.set_xlabel('$\mathregular{SiO_2}$ (wt. %)',fontsize=8)
+        ax.set_ylabel('$\mathregular{Na{_2}O + K{_2}O}$ (wt. %)',fontsize=8)
+        ax.tick_params(axis='both', which='major', labelsize=6)
+
         # Avoid repeat grid plotting
         first.append('Not First')      
     return(ax)
