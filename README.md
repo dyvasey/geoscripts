@@ -42,7 +42,7 @@ Vasey, D.A., Cowgill, E., and Cooper, K.M., 2021, A Preliminary Framework for Ma
 
 Vasey, D.A., Garcia, L., Cowgill, E., Trexler, C.C. and Godoladze, T., 2024, Episodic evolution of a protracted convergent margin revealed by detrital zircon geochronology in the Greater Caucasus: _Basin Research_, v. 36, no. 1, e12825, doi:10.1111/bre.12825
 
-Vasey, D.A., Cowgill, E., VanTongeren, J.A., Anderson, C.O., accepted, Relict Back-Arc Basin Crustal Structure in the Western Greater Caucasus, Georgia: _Geochemistry, Geophysics, Geosystems_.
+Vasey, D.A., Cowgill, E., VanTongeren, J.A., and Anderson, C.O., accepted, Relict Back-Arc Basin Crustal Structure in the Western Greater Caucasus, Georgia: _Geochemistry, Geophysics, Geosystems_.
 
 
 
