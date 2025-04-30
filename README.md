@@ -1,6 +1,6 @@
 # Geoscripts
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/dyvasey/geoscripts/HEAD) [![Anaconda-Server Badge](https://anaconda.org/davasey/geoscripts/badges/version.svg)](https://anaconda.org/davasey/geoscripts) [![DOI](https://zenodo.org/badge/334745753.svg)](https://zenodo.org/badge/latestdoi/334745753)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/dyvasey/geoscripts/HEAD) [![DOI](https://zenodo.org/badge/334745753.svg)](https://zenodo.org/badge/latestdoi/334745753)
 
 ## About
 
@@ -8,17 +8,18 @@ Geoscripts is a Python package designed to support geologic data analysis and fi
 
 ## Installation
 
-Geoscripts is still in very early stages of package development. The most recent release (v0.2.0) can currently be installed via conda from my [Anaconda channel](https://anaconda.org/davasey/geoscripts) using the following commands within a conda environment:
-
-`conda install -c davasey geoscripts`
-
-Installation via pip is currently not supported due to the dependency Cartopy, which requires additional compilers, as discussed [here](https://scitools.org.uk/cartopy/docs/latest/installing.html).
+Geoscripts is still in very early stages of package development. It can be installed via `pip` by cloning this repository, navigating into the main directory, and running `pip install`:
+```
+git clone https://github.com/dyvasey/geoscripts.git
+cd geoscripts
+pip install .
+```
 
 Geoscripts can also be run in a Binder environment using the Binder badge at the top of this README.
 
 ## Known Issues
 
-Geoscripts is still in very early stages of development. Most significantly, it currently lacks a test suite and workflow, as well as documentation external to the docstrings within the source code. Thus, the code cannot be guaranteed to run on any specific platform or version of Python and is only supported for Python 3.10 at the moment.
+Geoscripts is still in very early stages of development. Most significantly, it currently lacks a test suite and workflow, as well as documentation external to the docstrings within the source code. Thus, the code cannot be guaranteed to run on any specific platform or version of Python.
 
 ## Dependencies
 
@@ -40,6 +41,8 @@ Geoscripts currently has a long list of specific dependencies; a goal for future
 Vasey, D.A., Cowgill, E., and Cooper, K.M., 2021, A Preliminary Framework for Magmatism in Modern Continental Back-Arc Basins and Its Application to the Triassic-Jurassic Tectonic Evolution of the Caucasus: _Geochemistry, Geophysics, Geosystems_, v. 22, e2020GC009490, doi:10.1029/2020GC009490.
 
 Vasey, D.A., Garcia, L., Cowgill, E., Trexler, C.C. and Godoladze, T., 2024, Episodic evolution of a protracted convergent margin revealed by detrital zircon geochronology in the Greater Caucasus: _Basin Research_, v. 36, no. 1, e12825, doi:10.1111/bre.12825
+
+Vasey, D.A., Cowgill, E., VanTongeren, J.A., Anderson, C.O., accepted, Relict Back-Arc Basin Crustal Structure in the Western Greater Caucasus, Georgia: _Geochemistry, Geophysics, Geosystems_.
 
 
 
