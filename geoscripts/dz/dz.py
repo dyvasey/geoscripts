@@ -270,6 +270,30 @@ class DZSample:
         self.pie(spans,ax=ax_pie,autopct=autopct,wedgeprops=wedgeprops,**kwargs)
         return(ax_pie)
     
+    def add_pie_map(self,spans,ax,autopct=None,size_scaling=1,
+                    wedgeprops={},**kwargs):
+        """Add pie chart to map axes"""
+        # Convert lat/lon to axes coordinates
+        x_disp, y_disp = ax.transData.transform((self.latlon[1],self.latlon[0]))
+        x_axes, y_axes = ax.transAxes.inverted().transform((x_disp,y_disp))
+    
+        # Calculate size in axes coordinates
+        size = 0.05*size_scaling
+
+        # Use size to get calculate bottom left corner position
+        x0 = x_axes - size / 2
+        y0 = y_axes - size / 2
+
+        bounds = [x0,y0,size,size]
+
+        ax_pie = ax.inset_axes(bounds=bounds)
+        ax_pie.set_facecolor('none')
+
+        # Plot the pie chart
+        self.pie(spans,ax=ax_pie,autopct=autopct,wedgeprops=wedgeprops,**kwargs)
+        
+        return ax_pie
+
     def add_spans(self,spans,ax,colors=None,alpha=0.5,**kwargs):
         """ 
         Function to add spans to existing KDE 
