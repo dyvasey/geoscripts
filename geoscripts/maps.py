@@ -324,7 +324,8 @@ def narrow(lon='auto',lat='auto',ax=None,lfactor=1,**kwargs):
     # Plot arrow as annotation
     ax.annotate("",xy=(xstart,ystart),xycoords='data',xytext=(xend,yend),
                 textcoords='data',arrowprops=dict(arrowstyle="<|-",
-                                                  connectionstyle="arc3"))
+                                                  connectionstyle="arc3",
+                                                  color='black'))
     # Add N to arrow
     ax.text(xend,yend,'N',fontsize=7,ha='center')
     

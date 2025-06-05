@@ -6,9 +6,13 @@ import string
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-from mpltern.ternary.datasets import get_triangular_grid
 
 import pyrolite.plot
+
+from mpltern.ternary.datasets import get_triangular_grid
+from matplotlib.patches import Polygon
+from matplotlib.collections import PathCollection
+
 
 def TAS(SiO2,Na2O,K2O,ax=None,first= [],**plt_kwargs):
     """
@@ -35,7 +39,7 @@ def TAS(SiO2,Na2O,K2O,ax=None,first= [],**plt_kwargs):
     alkalis = Na2O + K2O
     
     # Plot data
-    ax.scatter(SiO2,alkalis, **plt_kwargs)
+    ax.scatter(SiO2,alkalis, **plt_kwargs,zorder=2)
     
     # Check if first empty to avoid repeat plotting of TAS grid/labels
     if first == []:
@@ -64,8 +68,8 @@ def TAS(SiO2,Na2O,K2O,ax=None,first= [],**plt_kwargs):
         labelsy = [1.55,2.8,3,3,3,8,11,8.5,7,5.65,7,9.3,11.5,14,12]
         labeltext = ['Picrobasalt','Basalt','Basaltic\nAndesite','Andesite',
                      'Dacite','Rhyolite','Trachyte/Trachydacite',
-                     'Trachy-andesite','Basaltic-\ntrachy-andesite',
-                     'Trachy-basalt','Tephrite/\nBasanite','Phono-tephrite',
+                     'Trachy\n-andesite','Basaltic-\ntrachy-\nandesite',
+                     'Trachy-\nbasalt','Tephrite/\nBasanite','Phono-tephrite',
                      'Tephri-phonolite','Phonolite','Foidite']
   
         # Create subalkaline/alkaline fields
@@ -74,20 +78,25 @@ def TAS(SiO2,Na2O,K2O,ax=None,first= [],**plt_kwargs):
         
         
         # Plot Subalkaline/Alkaline line
-        ax.plot(subalkx,subalky,'r--')
-        ax.text(38,2,'Alkaline',rotation=45,color='r',ha='center',va='center')
+        ax.plot(subalkx,subalky,'r--',zorder=1)
+        ax.text(38,2,'Alkaline',rotation=45,color='r',ha='center',va='center',fontsize=8,zorder=1)
         ax.text(49,2,'Subalkaline',rotation=45,color='r',ha='center',
-                va='center')
+                va='center',fontsize=8,zorder=1)
         
         #Set axes limits
         ax.set_xlim(35,80)
         ax.set_ylim(0,16)
        
         for z in range(15): # Loop through and plot TAS lines
-            ax.plot(lines[z][0],lines[z][1],'k')
+            ax.plot(lines[z][0],lines[z][1],'k',zorder=0)
             ax.text(labelsx[z],labelsy[z],labeltext[z],color='k',
-                    ha='center',va='center',fontsize=10)
+                    ha='center',va='center',fontsize=6,zorder=0)
         
+        # Set labels
+        ax.set_xlabel('$\mathregular{SiO_2}$ (wt. %)',fontsize=8)
+        ax.set_ylabel('$\mathregular{Na{_2}O + K{_2}O}$ (wt. %)',fontsize=8)
+        ax.tick_params(axis='both', which='major', labelsize=6)
+
         # Avoid repeat grid plotting
         first.append('Not First')      
     return(ax)
@@ -184,8 +193,8 @@ def afm(Na2O,K2O,FeOt,MgO,ax=None,first=[],fontsize=8,
         ax.plot(F,A,M,linestyle='--',color='black')
 
         # Add tholeiite and calc-alkaline
-        ax.text(0.7,0.15,0.15,'Tholeiitic',ha='center', va='center',fontsize=8)
-        ax.text(0.25,0.375,0.375,'Calc-Alkaline',ha='center', va='center',fontsize=8)
+        ax.text(0.7,0.15,0.15,'Tholeiitic',ha='center', va='center',fontsize=6)
+        ax.text(0.25,0.375,0.375,'Calc-Alkaline',ha='center', va='center',fontsize=6)
 
         first.append('NotFirst')
     
@@ -310,6 +319,55 @@ def cabanisd(Tb,Th,Ta,ax=None,grid=False,**plt_kwargs):
     ax.taxis.set_ticks([])
     ax.laxis.set_ticks([])
     ax.raxis.set_ticks([])
+
+    return(ax)
+
+def mantle_array(Th,Nb,Yb,ax=None,scatter=True,density=False,
+                 scatter_kwargs={},density_kwargs={}):
+    """
+    Mantle array plot after Pearce, 2008
+    """
+    if ax is None:
+        ax = plt.gca()
+
+    # Check for existing scatter plots
+    scatters = sum(isinstance(coll, PathCollection) for coll in ax.collections)
+
+    if scatters==0:
+    # MORB-OIB Array
+        x = [0.1,0.3,1000,1000,800,0.1]
+        y = [0.01,0.01,48,100,100,0.01]
+        xy_array = np.column_stack((x,y))
+
+        # Arc Array
+        b = (np.log10(10)-np.log10(1.2))/(np.log10(0.8)-np.log10(0.1))
+        a = np.log10(10)-np.log10(0.8)
+        xvals = np.arange(0,1000)
+        yvals = a*np.power(xvals,b)
+
+        pgon = Polygon(xy_array,alpha=0.2,zorder=0,color='gray')
+        ax.add_patch(pgon)
+        ax.plot(xvals,yvals,color='gray')
+
+        ax.text(3,0.07,'MORB-OIB Array',ha='center', va='center',fontsize=6,rotation=45)
+        ax.text(0.3,0.2,'Arc Array',ha='center', va='center',fontsize=6,rotation=45)
+
+        #first.append('NotFirst')
+
+    if density:
+        df = pd.DataFrame(data=[Nb/Yb,Th/Yb]).T
+        df.pyroplot.density(ax=ax,logx=True,logy=True,**density_kwargs)
+        
+    if scatter:
+        ax.scatter(Nb/Yb,Th/Yb,**scatter_kwargs)
+
+    ax.set_xscale('log')
+    ax.set_yscale('log')
+
+    ax.set_xlim(0.1,100)
+    ax.set_ylim(0.01,10)
+    ax.set_xlabel('Nb/Yb')
+    ax.set_ylabel('Th/Yb')
 
     return(ax)
 
