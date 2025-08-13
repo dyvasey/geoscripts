@@ -44,7 +44,9 @@ def weighted_mean(ages,errors,err_lev='2sig'):
     return(wmean,werror,mswd)
 
 def plot_weighted_mean(ages,errors,mean,mean_error,mswd,err_lev='2sig',ax=None, 
-                       label='Sample',syst_238=None,syst_error=False,**kwargs):
+                       label='Sample',syst_238=None,syst_error=False,
+                       err_linewidth=5, annotate_location=(0.5,0.05),
+                       **kwargs):
     """
     Make weighted mean plot in Isoplot style:
 
@@ -72,16 +74,18 @@ def plot_weighted_mean(ages,errors,mean,mean_error,mswd,err_lev='2sig',ax=None,
     
     x = np.arange(len(ages)).astype(str)
     ax.errorbar(x,ages,yerr=errors,fmt='none',
-                linewidth=5,**kwargs)
+                linewidth=err_linewidth,**kwargs)
     ax.axhline(mean,color='black',linewidth=1)
     ax.axhspan(ymin=mean-mean_error,ymax=mean+mean_error,
                color='grey',alpha=0.5)
+    
+    sig_dict = {'1sig':'1σ','2sig':'2σ'}
     
     base_annotation = (
         label +
         '\nWeighted Mean:\n' + str(round(mean,1)) 
         + ' +/- ' + str(round(mean_error,1)) 
-        + ' Ma ' + err_lev + '\nMSWD: ' + str(round(mswd,1))
+        + ' Ma ' + sig_dict[err_lev] + '\nMSWD: ' + str(round(mswd,1))
         )
     
     if syst_error == False:
@@ -90,7 +94,7 @@ def plot_weighted_mean(ages,errors,mean,mean_error,mswd,err_lev='2sig',ax=None,
     if syst_error == True:
         annotation = base_annotation + '\nSystematic error: ' + str(round(syst_238,1)) +'%'
     
-    ax.annotate(annotation,xy=(0.5,0.05),xycoords='axes fraction',fontsize=6)
+    ax.annotate(annotation,xy=annotate_location,xycoords='axes fraction',fontsize=6)
     ax.set_ylabel('Age (Ma)')
 
     ax.xaxis.set_ticklabels([])
