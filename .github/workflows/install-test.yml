@@ -1,0 +1,47 @@
+name: Install and test
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    # Weekly, to catch breakage from new releases of unpinned dependencies
+    - cron: "0 6 * * 1"
+
+jobs:
+  install-test:
+    name: Python ${{ matrix.python-version }} (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        python-version: ["3.11", "3.12", "3.13", "3.14"]
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: setup.py
+
+      - name: Install geoscripts
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install .
+          python -m pip install pytest
+
+      - name: Show installed versions
+        run: python -m pip list
+
+      - name: Check imports
+        # Run from outside the repo so the installed package is used, not the source tree
+        working-directory: ${{ runner.temp }}
+        run: python -c "import geoscripts, geoscripts.dz; print(geoscripts.__file__)"
+
+      - name: Run tests
+        env:
+          MPLBACKEND: Agg
+        run: python -m pytest -v
