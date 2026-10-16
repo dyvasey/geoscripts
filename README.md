@@ -17,6 +17,14 @@ pip install .
 
 Geoscripts can also be run in a Binder environment using the Binder badge at the top of this README.
 
+## Development
+
+Geoscripts uses [Poetry](https://python-poetry.org/) for development. After cloning the repository, install the package and development dependencies and run the tests with:
+```
+poetry install
+poetry run pytest
+```
+
 ## Known Issues
 
 Geoscripts is still in very early stages of development. Most significantly, it currently lacks a test suite and workflow, as well as documentation external to the docstrings within the source code. Thus, the code cannot be guaranteed to run on any specific platform or version of Python.
@@ -42,7 +50,7 @@ Vasey, D.A., Cowgill, E., and Cooper, K.M., 2021, A Preliminary Framework for Ma
 
 Vasey, D.A., Garcia, L., Cowgill, E., Trexler, C.C. and Godoladze, T., 2024, Episodic evolution of a protracted convergent margin revealed by detrital zircon geochronology in the Greater Caucasus: _Basin Research_, v. 36, no. 1, e12825, doi:10.1111/bre.12825
 
-Vasey, D.A., Cowgill, E., VanTongeren, J.A., and Anderson, C.O., accepted, Relict Back-Arc Basin Crustal Structure in the Western Greater Caucasus, Georgia: _Geochemistry, Geophysics, Geosystems_.
+Vasey, D.A., Cowgill, E., VanTongeren, J.A., and Anderson, C.O., 2025, Relict Back-Arc Basin Crustal Structure in the Western Greater Caucasus, Georgia: _Geochemistry, Geophysics, Geosystems_, v. 26, no. 5, e2024GC012036, doi:10.1029/2024GC012036
 
 
 
