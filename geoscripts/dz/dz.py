@@ -13,11 +13,15 @@ import pandas as pd
 import geopandas as gpd
 import statsmodels.api as sm
 
-from matplotlib.colors import cnames
+from matplotlib.colors import cnames,to_rgb
 from matplotlib.patches import Ellipse
 from matplotlib import cm
 
 from geoscripts.dz import mda
+
+def pie_autopct(pct):
+    """ Function for pie chart labeling """
+    return ('%1.0f%%' % pct) if pct > 1 else '' 
 
 class DZSample:
     """ Object to hold detrital zircon sample metadata and ages. """
@@ -130,7 +134,8 @@ class DZSample:
     
     def kde(self,ax=None,log_scale=True,add_n=True,xaxis=True,rug=True,
             method=None,ticks=[100,200,300,400,500,1000,2000,3000],
-            **kwargs):
+            spans=None,span_colors=None,span_kwargs={},add_pie=False,
+            pie_colors=None,pie_kwargs={},**kwargs):
         """
         Plot KDE via Seaborn using best age.
         
@@ -203,27 +208,105 @@ class DZSample:
         if xaxis == False:
             ax.get_xaxis().set_visible(False)
         
+        if spans is not None:
+            self.add_spans(spans=spans,ax=ax,colors=span_colors,**span_kwargs)
+        
+        if add_pie:
+            if pie_colors is None:
+                pie_colors=span_colors
+            self.add_pie(spans=spans,ax=ax,colors=pie_colors,**pie_kwargs)
+        
         return(ax)
     
-    def pie(self,bins,ax=None,**kwargs):
+    def pie(self,spans,ax=None,autopct=pie_autopct,wedgeprops={'alpha':0.5},
+    colors=None,**kwargs):
         """
         Plot pie chart showing relative percentages of zircon ages.
 
-        Requires that bestage is assigned
-        """
+        Requires that bestage is assigned. Ages not included in spans will
+        be shown as white space.
 
+         Parameters:
+            spans: List of tuples of ages to use for pie chart
+            ax: Axes on which to plot pie chart
+        """
+        # Assign axes to current axes if not specified
         if ax == None:
             ax = plt.gca()
 
-        hist = np.histogram(self.bestage,bins=bins)
+        # Assign colors if not specified
+        if colors is None:
+            prop_cycle = plt.rcParams['axes.prop_cycle']
+            colors = prop_cycle.by_key()['color']
+        
+        # Enforce white as last color
+        colors_filled = colors[0:len(spans)]
+        pie_colors = list(colors_filled) + ['white'] 
 
-        labels = [str(bins[x])+ '-' + str(bins[x+1]) + ' Ma' for x in range(len(bins)-1)]
+        # Create empty list of sizes
+        sizes = []
 
-        ax.pie(hist[0],labels=labels,**kwargs)
+        # Loop through spans and count ages in each span
+        for span in spans:
+            condition = (self.bestage>=span[0])&(self.bestage<span[1])
+            count = self.bestage[condition].count()
+            sizes.append(count)
+        
+        # Get number of ages not included in spans
+        not_counted = len(self.bestage) - sum(sizes)
+
+        # Add to total size of pie chart
+        total = sizes + [not_counted]
+
+        # Plot
+        ax.pie(total,autopct=autopct,wedgeprops=wedgeprops,colors=pie_colors,**kwargs)
 
         return(ax)
+    
+    def add_pie(self,spans,ax,autopct=None,bounds=[0.7,0.5,0.5,0.5],
+                wedgeprops={'alpha':0.5},**kwargs):
+        """Function to add pie chart to bottom right of existing KDE"""
+        ax_pie = ax.inset_axes(bounds=bounds)
+        self.pie(spans,ax=ax_pie,autopct=autopct,wedgeprops=wedgeprops,**kwargs)
+        return(ax_pie)
+    
+    def add_pie_map(self,spans,ax,autopct=None,size_scaling=1,
+                    wedgeprops={},**kwargs):
+        """Add pie chart to map axes"""
+        # Convert lat/lon to axes coordinates
+        x_disp, y_disp = ax.transData.transform((self.latlon[1],self.latlon[0]))
+        x_axes, y_axes = ax.transAxes.inverted().transform((x_disp,y_disp))
+    
+        # Calculate size in axes coordinates
+        size = 0.05*size_scaling
 
+        # Use size to get calculate bottom left corner position
+        x0 = x_axes - size / 2
+        y0 = y_axes - size / 2
+
+        bounds = [x0,y0,size,size]
+
+        ax_pie = ax.inset_axes(bounds=bounds)
+        ax_pie.set_facecolor('none')
+
+        # Plot the pie chart
+        self.pie(spans,ax=ax_pie,autopct=autopct,wedgeprops=wedgeprops,**kwargs)
         
+        return ax_pie
+
+    def add_spans(self,spans,ax,colors=None,alpha=0.5,**kwargs):
+        """ 
+        Function to add spans to existing KDE 
+        
+        TODO: Set up so spans are different colors
+        """
+        if colors is None:
+            prop_cycle = plt.rcParams['axes.prop_cycle']
+            colors = prop_cycle.by_key()['color']
+
+        for k,span in enumerate(spans):
+            ax.axvspan(*span,alpha=alpha,lw=0,color=colors[k],**kwargs)
+        return(ax)
 
     def plot_agehf(self,hf_col,ax=None,**kwargs):
         """
@@ -890,6 +973,8 @@ def age2ratios(age,lambda238=1.55125e-10,lambda235=9.8485e-10):
     )
 
     return(ratio238206,ratio207206)
+
+
             
 
             
