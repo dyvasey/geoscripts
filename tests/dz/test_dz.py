@@ -11,11 +11,13 @@ import pytest
 from geoscripts.dz import dz
 
 # Create synthetic data
-ages = pd.Series([50,150,145,250,252,255,300,355,1542,2555,3000])
+ages = [50,150,145,250,252,255,300,355,1542,2555,3000]
+uth = [2,3,15,4,25,5,10,3,2,12,4]
+agedata = pd.DataFrame({'Best Age':ages,'U/Th':uth})
 
 # Create basic dz sample
-smp = dz.DZSample(name='test',agedata=ages)
-smp.bestage = smp.agedata
+smp = dz.DZSample(name='test',agedata=agedata)
+smp.bestage = smp.agedata['Best Age']
 smp.latlon = (42,-118)
 
 def test_pie():
@@ -77,6 +79,16 @@ def test_add_pie_map():
 
     # Test that the axes contains a child axes
     assert len(ax.child_axes)==1
+
+def test_classify_uth():
+    """Test classify_uth function"""
+
+    smp.classify_uth('U/Th')
+
+    # Test that only values above the cutoff (10) are classified as metamorphic
+    expected = ['Igneous','Igneous','Metamorphic','Igneous','Metamorphic',
+                'Igneous','Igneous','Igneous','Igneous','Metamorphic','Igneous']
+    assert list(smp.agedata['Origin']) == expected
 
 def test_add_spans():
     """Test Add Spans function"""

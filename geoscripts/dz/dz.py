@@ -776,6 +776,12 @@ class DZSample:
                    label=self.name,color=self.color,**kwargs)
         
         return(ax)
+
+    def classify_uth(self, uth_col, cutoff=10, col='Origin'):
+        """Label analyses as igneous or metamorphic by U/Th"""
+        self.agedata[col] = np.where(self.agedata[uth_col] > cutoff, 'Metamorphic',
+                                     'Igneous')
+        return
     
     def export_ages(self,filename=None):
         """
