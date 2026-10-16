@@ -1,4 +1,5 @@
 __pycache__/
-.Rhistory
 build/
 *.egg-info/
+dist/
+.venv/
