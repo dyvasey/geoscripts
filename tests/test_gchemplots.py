@@ -87,7 +87,7 @@ def test_mantle_array():
 
     # Test whether the annotations plotted
     plot_text = [child.get_text() for child in ax.get_children() if isinstance(child,matplotlib.text.Text)]
-    assert plot_text[0] == 'Mantle Array'
+    assert plot_text[0] == 'MORB-OIB Array'
     assert plot_text[1] == 'Arc Array'
 
     # Test that the lables plotted
