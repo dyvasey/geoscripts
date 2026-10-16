@@ -145,7 +145,8 @@ class DZSample:
             add_n: Whether to add number of analyses to plot
             xaxis: Whether to show x axis labels
             rug: Whether to add ticks to bottom of plot
-            method: Method for getting KDE bandwidth
+            method: Bandwidth method passed to Seaborn as bw_method
+                (default None uses Scott's rule)
         
         Returns:
             ax: Axes which KDE plotted
@@ -153,41 +154,9 @@ class DZSample:
         if ax == None:
             ax = plt.gca()
         
-        # Transform data to log scale if needed for bandwidth calculation
-        if log_scale==True:
-            data_bw = np.log10(self.bestage)
-        else:
-            data_bw = self.bestage
-        
-        # STD of sample - transformed to log scale if needed - needed to
-        # feed bandwidth factor to Seaborn
-        std = data_bw.std()
-        
-        # Botev R script
-        if method=='botev_r':
-            from geoscripts.dz import botev
-            bandwidth = botev.botev_r(data_bw)
-            bw_method = bandwidth/std
-        
-        # Botev Python script - currently doesn't work
-        elif method=='botev_py':
-            print('Warning: Method may be unstable.')
-            grid,density,bandwidth = botev.py_kde(data_bw)
-            bw_method = bandwidth/std
-            
-        elif method=='vermeesch':
-            from geoscripts.dz import botev
-            bandwidth = botev.vermeesch_r(data_bw)
-            bw_method = bandwidth/std
-            
-        # Use Seaborn default
-        else:
-            bw_method = 'scott'
-            
-            
         sns.kdeplot(self.bestage,log_scale=log_scale,label=self.name,
                     ax=ax,fill=True,color=self.color,gridsize=1000,
-                    bw_method=bw_method,**kwargs)
+                    bw_method=method,**kwargs)
         if rug == True:
             sns.rugplot(self.bestage,ax=ax,height=-0.03,clip_on=False,
                         color=self.color,expand_margins=False,
@@ -338,10 +307,10 @@ class DZSample:
             ax: Axes on which to draw plot
             include_ages: Boolean for whether to include scatter plot of individual ages
             cmap: Colormap for KDE
-            method: Method for bandwidth calculation. Options include 'vermeesch','botev_r', 
-                a list of bandwidths for the x and y axes, or the 'normal reference' 
-                bandwidth in statsmodels. Current recommended use is a list of
-                bandwidths.
+            method: Method for bandwidth calculation. Options include a list of
+                bandwidths for the x and y axes, or the 'normal reference'
+                bandwidth in statsmodels (default). Current recommended use is
+                a list of bandwidths.
             marker_color: Color for scatter plot of ages if used.
             xlim: Limits of x axis. Default is automatic determination of minimum and
                 maximum values, or can be provided as a tuple.
@@ -359,27 +328,7 @@ class DZSample:
         if ylim=='auto':
             ylim = (np.min(hf),np.max(hf))
 
-        if method=='vermeesch':
-            import botev
-            bw_ages = botev.vermeesch_r(ages)
-            print(bw_ages)
-
-            bw_hf = botev.vermeesch_r(hf)
-            print(bw_hf)
-
-            bw = [bw_ages,bw_hf]
-
-        elif method=='botev_r':
-            import botev
-            bw_ages = botev.botev_r(ages)
-            print(bw_ages)
-
-            bw_hf = botev.botev_r(hf)
-            print(bw_hf)
-
-            bw = [bw_ages,bw_hf]
-        
-        elif isinstance(method,list):
+        if isinstance(method,list):
             bw=method
         
         else:

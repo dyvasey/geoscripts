@@ -1,0 +1,37 @@
+[project]
+name = "geoscripts"
+version = "0.3.0"
+description = "Python functions used for geologic data analysis and figure construction"
+authors = [{ name = "Dylan Vasey", email = "dyvasey@gmail.com" }]
+license = "MIT"
+license-files = ["LICENSE.txt"]
+readme = "README.md"
+requires-python = ">=3.11"
+keywords = ["geoscience", "geology"]
+classifiers = ["Programming Language :: Python :: 3 :: Only"]
+dependencies = [
+    "numpy",
+    "pandas",
+    "matplotlib",
+    "seaborn",
+    "scipy",
+    "shapely",
+    "cartopy",
+    "statsmodels",
+    "geopandas",
+    "mpltern",
+    "pyrolite",
+]
+
+[project.urls]
+Repository = "https://github.com/dyvasey/geoscripts"
+
+[tool.poetry]
+packages = [{ include = "geoscripts" }]
+
+[tool.poetry.group.dev.dependencies]
+pytest = "*"
+
+[build-system]
+requires = ["poetry-core>=2.0.0"]
+build-backend = "poetry.core.masonry.api"
