@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
+from matplotlib.collections import PolyCollection
 
 import pytest
 
@@ -89,6 +90,34 @@ def test_classify_uth():
     expected = ['Igneous','Igneous','Metamorphic','Igneous','Metamorphic',
                 'Igneous','Igneous','Igneous','Igneous','Metamorphic','Igneous']
     assert list(smp.agedata['Origin']) == expected
+
+def test_kde():
+    """Test KDE function"""
+
+    # Create figure
+    fig,ax = plt.subplots(1)
+
+    # Plot basic KDE
+    smp.kde(ax=ax,rug=False)
+
+    # Test that one filled KDE plotted
+    fills = [c for c in ax.collections if isinstance(c,PolyCollection)]
+    assert len(fills)==1
+
+    # Test KDE split into groups with hue
+    # Classify here so test does not depend on test order
+    smp.classify_uth('U/Th')
+
+    fig2,ax2 = plt.subplots(1)
+    smp.kde(ax=ax2,hue='Origin',rug=False)
+
+    # Test that one filled KDE plotted for each group
+    fills = [c for c in ax2.collections if isinstance(c,PolyCollection)]
+    assert len(fills)==2
+
+    # Test that legend shows both groups
+    labels = [t.get_text() for t in ax2.get_legend().get_texts()]
+    assert sorted(labels)==['Igneous','Metamorphic']
 
 def test_add_spans():
     """Test Add Spans function"""

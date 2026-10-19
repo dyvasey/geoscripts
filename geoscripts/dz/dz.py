@@ -133,8 +133,8 @@ class DZSample:
         return(self.bestage)
     
     def kde(self,ax=None,log_scale=True,add_n=True,xaxis=True,rug=True,
-            method=None,ticks=[100,200,300,400,500,1000,2000,3000],
-            spans=None,span_colors=None,span_kwargs={},add_pie=False,
+            method=None,ticks=[100,200,300,400,500,1000,2000,3000],hue=None,
+            palette=None,spans=None,span_colors=None,span_kwargs={},add_pie=False,
             pie_colors=None,pie_kwargs={},**kwargs):
         """
         Plot KDE via Seaborn using best age.
@@ -147,20 +147,44 @@ class DZSample:
             rug: Whether to add ticks to bottom of plot
             method: Bandwidth method passed to Seaborn as bw_method
                 (default None uses Scott's rule)
-        
+            ticks: Ages (Ma) at which to place x axis ticks
+            hue: Column in agedata used to split KDE into groups (e.g.,
+                'Origin' from classify_uth)
+            palette: Colors for each hue group, passed to Seaborn (only used
+                with hue)
+            spans: List of tuples of ages to shade on KDE
+            span_colors: Colors for spans
+            span_kwargs: Dictionary of keyword arguments for add_spans
+            add_pie: Whether to add pie chart of spans to KDE
+            pie_colors: Colors for pie chart (defaults to span_colors)
+            pie_kwargs: Dictionary of keyword arguments for add_pie
+            **kwargs: Additional keyword arguments for Seaborn kdeplot
+
         Returns:
             ax: Axes which KDE plotted
         """
         if ax == None:
             ax = plt.gca()
-        
-        sns.kdeplot(self.bestage,log_scale=log_scale,label=self.name,
-                    ax=ax,fill=True,color=self.color,gridsize=1000,
-                    bw_method=method,**kwargs)
-        if rug == True:
-            sns.rugplot(self.bestage,ax=ax,height=-0.03,clip_on=False,
-                        color=self.color,expand_margins=False,
-                        linewidth=1)
+
+        if hue is not None:
+            df = pd.DataFrame({'Best Age': self.bestage, 
+                               hue: self.agedata.loc[self.bestage.index, hue]})
+            sns.kdeplot(data=df,x='Best Age',hue=hue,log_scale=log_scale,
+                        ax=ax,fill=True,gridsize=1000,palette=palette,
+                        bw_method=method,**kwargs)
+            if rug == True:
+                sns.rugplot(data=df,x='Best Age',hue=hue,ax=ax,height=-0.03,
+                            clip_on=False,expand_margins=False,palette=palette,
+                            linewidth=1)
+            
+        else:
+            sns.kdeplot(self.bestage,log_scale=log_scale,label=self.name,
+                                    ax=ax,fill=True,color=self.color,gridsize=1000,
+                                    palette=palette,bw_method=method,**kwargs)
+            if rug == True:
+                sns.rugplot(self.bestage,ax=ax,height=-0.03,clip_on=False,
+                            color=self.color,expand_margins=False,
+                            palette=palette,linewidth=1)
         
         ax.spines['top'].set_visible(False)
         ax.spines['right'].set_visible(False)
@@ -371,7 +395,7 @@ class DZSample:
         ax.text(0.7,0.55,'CHUR',transform=ax.transAxes,fontsize=8)
 
         ax.set_xlabel('Age (Ma)')
-        ax.set_ylabel('$\epsilon Hf_i$')
+        ax.set_ylabel(r'$\epsilon Hf_i$')
 
         if include_ages==True:
             self.plot_agehf(hf_col,ax=ax,facecolors=marker_color,edgecolors='black',label=self.name,s=4,
