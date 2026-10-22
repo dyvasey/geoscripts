@@ -5,7 +5,8 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
-from matplotlib.collections import PolyCollection
+from matplotlib.collections import LineCollection, PolyCollection
+from scipy.stats import norm
 
 import pytest
 
@@ -118,6 +119,47 @@ def test_kde():
     # Test that legend shows both groups
     labels = [t.get_text() for t in ax2.get_legend().get_texts()]
     assert sorted(labels)==['Igneous','Metamorphic']
+
+    # Test fixed bandwidth gives the same kernel SD for groups with
+    # different spreads. Compare plotted curves to a Gaussian KDE with
+    # SD = h in log10 space, scaled by each group's share of grains
+    # (seaborn's default common_norm=True).
+    h = 0.05
+    fig3,ax3 = plt.subplots(1)
+    smp.kde(ax=ax3,hue='Origin',rug=False,bandwidth=h,bw_adjust=0.2)
+
+    log_ages = np.log10(smp.bestage)
+    origin = smp.agedata.loc[smp.bestage.index,'Origin']
+    n_total = len(log_ages)
+    expected_peaks = []
+    for group in ['Igneous','Metamorphic']:
+        x = log_ages[origin==group].values
+        grid = np.linspace(x.min()-0.5,x.max()+0.5,2000)
+        dens = norm.pdf(grid[:,None],x[None,:],h).mean(axis=1)
+        expected_peaks.append(dens.max()*len(x)/n_total)
+
+    fills = [c for c in ax3.collections if isinstance(c,PolyCollection)]
+    plotted_peaks = [c.get_paths()[0].vertices[:,1].max() for c in fills]
+    assert np.allclose(sorted(plotted_peaks),sorted(expected_peaks),rtol=0.01)
+
+    # Test rug ticks are clipped to the axis x range but extend below it
+    fig4,ax4 = plt.subplots(1)
+    smp.kde(ax=ax4,hue='Origin')
+    rugs = [c for c in ax4.collections if isinstance(c,LineCollection)]
+    assert len(rugs)>0
+    for c in rugs:
+        assert c.get_clip_on()
+        box = c.get_clip_box()
+        assert np.isclose(box.x0,ax4.bbox.x0) and np.isclose(box.x1,ax4.bbox.x1)
+        assert box.y0<ax4.bbox.y0
+
+    # Test no minor ticks (log axis otherwise labels them, e.g. 6x10^2)
+    fig5,ax5 = plt.subplots(1)
+    smp.kde(ax=ax5,log_scale=True)
+    fig5.canvas.draw()
+    assert len(ax5.xaxis.get_minorticklocs())==0
+
+    plt.close('all')
 
 def test_add_spans():
     """Test Add Spans function"""

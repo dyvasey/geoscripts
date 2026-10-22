@@ -16,6 +16,7 @@ import statsmodels.api as sm
 from matplotlib.colors import cnames,to_rgb
 from matplotlib.patches import Ellipse
 from matplotlib import cm
+from matplotlib.transforms import Bbox, TransformedBbox
 
 from geoscripts.dz import mda
 
@@ -132,7 +133,7 @@ class DZSample:
         
         return(self.bestage)
     
-    def kde(self,ax=None,log_scale=True,add_n=True,xaxis=True,rug=True,
+    def kde(self,ax=None,log_scale=True,add_n=True,xaxis=True,rug=True,bandwidth=None,
             method=None,ticks=[100,200,300,400,500,1000,2000,3000],hue=None,
             palette=None,spans=None,span_colors=None,span_kwargs={},add_pie=False,
             pie_colors=None,pie_kwargs={},**kwargs):
@@ -144,9 +145,13 @@ class DZSample:
             log_scale: Whether to plot age on logarithmic scale
             add_n: Whether to add number of analyses to plot
             xaxis: Whether to show x axis labels
-            rug: Whether to add ticks to bottom of plot
+            rug: Whether to add ticks to bottom of plot. Ticks are drawn
+                just below the axis and clipped to its x range.
+            bandwidth: Fixed kernel standard deviation, the same for every
+                hue group. Units are log10(Ma) if log_scale=True, otherwise
+                Ma. Overrides method and sets bw_adjust=1.
             method: Bandwidth method passed to Seaborn as bw_method
-                (default None uses Scott's rule)
+                (default None uses Scott's rule). Ignored if bandwidth is set.
             ticks: Ages (Ma) at which to place x axis ticks
             hue: Column in agedata used to split KDE into groups (e.g.,
                 'Origin' from classify_uth)
@@ -166,25 +171,38 @@ class DZSample:
         if ax == None:
             ax = plt.gca()
 
+        if bandwidth is not None:
+            # Calculate method to pass to seaborn by taking fixed bandwidth over
+            # standard deviation of the data.
+            method = lambda k: bandwidth / np.std(k.dataset, ddof=1)
+            # Override bw_adjust so bandwidth is correct
+            kwargs['bw_adjust'] = 1
+
         if hue is not None:
             df = pd.DataFrame({'Best Age': self.bestage, 
                                hue: self.agedata.loc[self.bestage.index, hue]})
             sns.kdeplot(data=df,x='Best Age',hue=hue,log_scale=log_scale,
                         ax=ax,fill=True,gridsize=1000,palette=palette,
                         bw_method=method,**kwargs)
-            if rug == True:
+            if rug:
+                n_before = len(ax.collections)
                 sns.rugplot(data=df,x='Best Age',hue=hue,ax=ax,height=-0.03,
-                            clip_on=False,expand_margins=False,palette=palette,
+                            expand_margins=False,palette=palette,
                             linewidth=1)
+                for c in ax.collections[n_before:]:
+                    c.set_clip_box(TransformedBbox(Bbox([[0, -0.1], [1, 1]]), ax.transAxes))
             
         else:
             sns.kdeplot(self.bestage,log_scale=log_scale,label=self.name,
                                     ax=ax,fill=True,color=self.color,gridsize=1000,
                                     palette=palette,bw_method=method,**kwargs)
-            if rug == True:
-                sns.rugplot(self.bestage,ax=ax,height=-0.03,clip_on=False,
+            if rug:
+                n_before = len(ax.collections)
+                sns.rugplot(self.bestage,ax=ax,height=-0.03,
                             color=self.color,expand_margins=False,
                             palette=palette,linewidth=1)
+                for c in ax.collections[n_before:]:
+                    c.set_clip_box(TransformedBbox(Bbox([[0, -0.1], [1, 1]]), ax.transAxes))
         
         ax.spines['top'].set_visible(False)
         ax.spines['right'].set_visible(False)
@@ -193,6 +211,7 @@ class DZSample:
         
         ax.set_xticks(ticks)
         ax.set_xticklabels(ticks)
+        ax.minorticks_off()
         
         if add_n == True:
             text = 'n = ' + str(self.bestage.count())
