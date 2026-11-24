@@ -972,6 +972,29 @@ def age2ratios(age,lambda238=1.55125e-10,lambda235=9.8485e-10):
 
     return(ratio238206,ratio207206)
 
+def error_bandwidth(samples, log_scale=True):
+    """
+    Calculate bandwidth equal to median 2 sigma analytical uncertainty.
+    """
+
+    if isinstance(samples, DZSample):
+        samples = [samples]
+
+    errors = []
+    for smp in samples:
+        err = smp.besterror
+        if smp.error_level == '1sig':
+            err = err * 2
+        if log_scale:
+            err = err / smp.bestage
+        errors.append(err)
+
+    median = pd.concat(errors).median()
+
+    if log_scale:
+        return median / np.log(10)
+
+    return median
 
             
 
